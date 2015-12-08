@@ -1,0 +1,16 @@
+captcha_resource:
+    path: /captcha_resource/{fileName}
+    defaults: { _controller: CaptchaBundle:CaptchaResource:getResource, fileName: none }
+    requirements:
+        fileName: \D+
+    methods: [GET]
+
+captcha_layout_stylesheet_url:
+    path: /captcha_resource/lbd_layout.css
+    defaults: { _controller: CaptchaBundle:CaptchaResource:getResource, fileName: lbd_layout.css }
+    methods: [GET]
+
+captcha_handler:
+    path: /captcha_handler
+    defaults: { _controller: CaptchaBundle:CaptchaHandler:index }
+    methods: [GET]

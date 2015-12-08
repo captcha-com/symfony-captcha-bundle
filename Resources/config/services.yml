@@ -1,0 +1,31 @@
+parameters:
+    botdetect_captcha.class: Captcha\Bundle\CaptchaBundle\Integration\BotDetectCaptcha
+    captcha_routes_loader.class: Captcha\Bundle\CaptchaBundle\Routing\CaptchaRoutesLoader
+    captcha_type.class: Captcha\Bundle\CaptchaBundle\Form\Type\CaptchaType
+    valid_captcha_validator.class: Captcha\Bundle\CaptchaBundle\Validator\Constraints\ValidCaptchaValidator
+
+services:
+    captcha:
+        class: %botdetect_captcha.class%
+        arguments:
+            - '@service_container'
+
+    captcha.routing_loader:
+        class: %captcha_routes_loader.class%
+        tags:
+            - { name: routing.loader }
+
+    captcha.form.type:
+        class: %captcha_type.class%
+        arguments:
+            - '@service_container'
+            - '%captcha.config%'
+        tags:
+            - { name: form.type, alias: captcha }
+
+    captcha.validator:
+        class: %valid_captcha_validator.class%
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: validator.constraint_validator, alias: valid_captcha }

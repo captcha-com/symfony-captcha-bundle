@@ -1,0 +1,34 @@
+{
+    "name": "captcha-com/symfony-captcha-bundle",
+    "type": "symfony-bundle",
+    "description": "BotDetect 3 PHP Captcha integration for the Symfony framework.",
+    "keywords": ["captcha", "captcha bundle", "symfony captcha"],
+    "homepage": "http://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html",
+    "authors": [
+        {
+            "name": "BotDetect Captcha",
+            "email": "botdetect.support@captcha.com",
+            "homepage": "http://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html"
+        }
+    ],
+    "support": {
+        "email": "botdetect.support@captcha.com",
+        "issues": "http://captcha.com/support",
+        "forum": "http://captcha.com/support",
+        "source": "http://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html"
+    },
+    "require": {
+        "captcha-com/captcha": "3.*",
+        "php": ">=5.3.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Captcha\\Bundle\\CaptchaBundle\\": "/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.x-dev"
+        }
+    }
+}
