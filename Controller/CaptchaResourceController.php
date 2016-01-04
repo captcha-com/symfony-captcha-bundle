@@ -18,10 +18,14 @@ class CaptchaResourceController extends Controller
      */
     public function getResourceAction($fileName)
     {
+        if (!preg_match('/^[a-z_]+\.(css|gif|js)$/', $fileName)) {
+            throw new BadRequestHttpException('Invalid file name.');
+        }
+
         $resourcePath = realpath(Path::getPublicDirPathInLibrary() . $fileName);
 
         if (!is_file($resourcePath)) {
-            throw new BadRequestHttpException('command');
+            throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $fileName));
         }
 
         // captcha resource file information
