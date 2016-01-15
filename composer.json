@@ -18,7 +18,7 @@
         "source": "http://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html"
     },
     "require": {
-        "captcha-com/captcha": "3.*",
+        "captcha-com/captcha": "4.*",
         "php": ">=5.3.9"
     },
     "autoload": {
@@ -28,7 +28,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.x-dev"
+            "dev-master": "4.x-dev"
         }
     }
 }

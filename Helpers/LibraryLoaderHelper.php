@@ -38,7 +38,7 @@ final class LibraryLoaderHelper
      */
     private static function loadBotDetectLibrary()
     {
-        self::includeFile(Path::getBotDetectFilePathInLibrary(), true);
+        self::includeFile(Path::getBotDetectFilePath(), true);
     }
 
     /**

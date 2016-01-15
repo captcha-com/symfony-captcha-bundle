@@ -12,49 +12,29 @@ class CaptchaResourceController extends Controller
     /**
      * Get contents of Captcha resources (js, css, gif files).
      *
-     * @param string  $fileName
+     * @param string  $filename
      * 
      * @throws BadRequestHttpException 
      */
-    public function getResourceAction($fileName)
+    public function indexAction($filename)
     {
-        if (!preg_match('/^[a-z_]+\.(css|gif|js)$/', $fileName)) {
+        if (!preg_match('/^[a-z-]+\.(css|gif|js)$/', $filename)) {
             throw new BadRequestHttpException('Invalid file name.');
         }
 
-        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . $fileName);
+        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . $filename);
 
         if (!is_file($resourcePath)) {
-            throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $fileName));
+            throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $filename));
         }
 
-        // captcha resource file information
+        $mimesType = array('css' => 'text/css', 'gif' => 'image/gif', 'js'  => 'application/x-javascript');
         $fileInfo = pathinfo($resourcePath);
-        $fileContents = file_get_contents($resourcePath);
-        $mimeType = self::getMimeType($fileInfo['extension']);
 
         return new Response(
-            $fileContents,
+            file_get_contents($resourcePath),
             200,
-            array('content-type' => $mimeType)
+            array('content-type' => $mimesType[$fileInfo['extension']])
         );
-    }
-
-    /**
-     * Mime type information.
-     *
-     * @param string  $ext
-     * 
-     * @return string
-     */
-    private static function getMimeType($ext)
-    {
-        $mimes = array(
-            'css' => 'text/css',
-            'gif' => 'image/gif',
-            'js'  => 'application/x-javascript'
-        );
-
-        return (in_array($ext, array_keys($mimes))) ? $mimes[$ext] : '';
     }
 }

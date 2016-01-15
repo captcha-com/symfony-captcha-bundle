@@ -34,9 +34,9 @@ final class Path
      *
      * @return string
      */
-    public static function getBotDetectFilePathInLibrary()
+    public static function getBotDetectFilePath()
     {
-        return self::getLibPackageDirPath() . 'lib/botdetect.php';
+        return __DIR__ . '/../Provider/botdetect.php';
     }
 
     /**
