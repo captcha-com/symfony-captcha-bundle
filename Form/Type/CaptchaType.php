@@ -59,8 +59,10 @@ class CaptchaType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!isset($options['captchaConfig'])) {
-            throw new InvalidArgumentException(sprintf('The %s requires you to declare the "%s" option and assign a captcha configuration variable.', 'Captcha field type', 'captchaConfig'));
+        if (!isset($options['captchaConfig']) || '' === $options['captchaConfig']) {
+            $errorMessage  = 'The Captcha field type requires you to declare the "captchaConfig" option and assigns a captcha configuration key that defined in app/config/captcha.php file. ';
+            $errorMessage .= 'For example: $builder->add(\'captchaCode\', CaptchaType::class, array(\'captchaConfig\' => \'LoginCaptcha\'))';
+            throw new InvalidArgumentException($errorMessage);
         }
 
         $this->captcha = $this->container->get('captcha')->setConfig($options['captchaConfig']);

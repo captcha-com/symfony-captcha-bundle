@@ -1,6 +1,6 @@
 <?php
 
-namespace Captcha\Bundle\CaptchaBundle\Config;
+namespace Captcha\Bundle\CaptchaBundle\Support;
 
 final class Path
 {
@@ -52,9 +52,12 @@ final class Path
     /**
      * Physical path of the Symfony's config directory.
      *
+     * @param string  $path
+     *
      * @return string
      */
-    public static function getConfigDirPath() {
-        return __DIR__ . '/../../../../app/config';
+    public static function getConfigDirPath($path = '')
+    {
+        return __DIR__ . '/../../../../app/config' . ($path ? '/' . $path : $path);
     }
 }

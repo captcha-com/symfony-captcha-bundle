@@ -5,8 +5,6 @@ namespace Captcha\Bundle\CaptchaBundle\Integration;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class BotDetectCaptcha
 {
@@ -42,19 +40,9 @@ class BotDetectCaptcha
      */
     public function setConfig($configName)
     {
-        if (!$this->container->hasParameter($configName)) {
-            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $configName));
-        }
-
-        $captchaConfig = $this->container->getParameter($configName);
-
-        if (!is_array($captchaConfig)) {
-            throw new UnexpectedTypeException($captchaConfig, 'array');
-        }
-
         return $this->getCaptchaInstance(
             $this->container->get('session'),
-            $captchaConfig
+            $configName
         );
     }
 
@@ -70,14 +58,14 @@ class BotDetectCaptcha
      * Get an instance of the Captcha class.
      * 
      * @param SessionInterface  $session
-     * @param array             $config
+     * @param string            $configName
      * 
      * @return object
      */
-    public function getCaptchaInstance(SessionInterface $session = null, array $config = array())
+    public function getCaptchaInstance(SessionInterface $session = null, $configName = '')
     {
         if (!$this->captchaInstanceAlreadyCreated()) {
-            $this->captcha = new BotDetectCaptchaHelper($session, $config);
+            $this->captcha = new BotDetectCaptchaHelper($session, $configName);
         }
 
         return $this->captcha;

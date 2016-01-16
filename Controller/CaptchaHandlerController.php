@@ -4,7 +4,6 @@ namespace Captcha\Bundle\CaptchaBundle\Controller;
 
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CaptchaHandlerController extends Controller
@@ -48,8 +47,7 @@ class CaptchaHandlerController extends Controller
 
         // disallow audio file search engine indexing
         header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
-        echo $responseBody;
-        exit;
+        echo $responseBody; exit;
     }
 
     /**
@@ -62,10 +60,7 @@ class CaptchaHandlerController extends Controller
         $captchaId = $this->getUrlParameter('c');
 
         if (!is_null($captchaId) && preg_match('/^(\w+)$/ui', $captchaId)) {
-            return new BotDetectCaptchaHelper(
-                $this->get('session'),
-                array('captcha_id' => $captchaId)
-            );
+            return new BotDetectCaptchaHelper($this->get('session'), $captchaId);
         } else {
             throw new BadRequestHttpException('Invalid captcha id.');
         }

@@ -1,12 +1,11 @@
 <?php
 
-namespace Captcha\Bundle\CaptchaBundle\Helpers;
+namespace Captcha\Bundle\CaptchaBundle\Support;
 
-use Captcha\Bundle\CaptchaBundle\Config\Path;
-use Captcha\Bundle\CaptchaBundle\Config\UserCaptchaConfiguration;
+use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-final class LibraryLoaderHelper
+final class LibraryLoader
 {
     /**
      * Disable instance creation.
@@ -17,18 +16,14 @@ final class LibraryLoaderHelper
      * Load BotDetect CAPTCHA Library and override Captcha Library settings.
      *
      * @param SessionInterface  $session
-     * @param array             $config
      */
-    public static function load(SessionInterface $session, array $config)
+    public static function load(SessionInterface $session)
     {
         // load bd php library
         self::loadBotDetectLibrary();
 
         // load the captcha configuration defaults
         self::loadCaptchaConfigDefaults($session);
-
-        // load user's captcha config
-        self::loadUserCaptchaConfig($session, $config);
     }
 
     /**
@@ -49,27 +44,6 @@ final class LibraryLoaderHelper
     private static function loadCaptchaConfigDefaults(SessionInterface $session)
     {
         self::includeFile(Path::getCaptchaConfigDefaultsFilePath(), true, $session);
-    }
-
-    /**
-     * Load user's captcha configuration.
-     *
-     * @param SessionInterface  $session
-     * @param array             $config
-     */
-    private static function loadUserCaptchaConfig(SessionInterface $session, array $config)
-    {
-        $userConfig = new UserCaptchaConfiguration($session);
-
-        // store user's captcha config file path
-        if (isset($config['captcha_id']) &&
-            isset($config['captcha_config_file_path'])
-        ) {
-            $userConfig->storePath($config['captcha_id'], $config['captcha_config_file_path']);
-        }
-
-        $configFilePath = $userConfig->getPhysicalPath();
-        self::includeFile($configFilePath);
     }
 
     /**

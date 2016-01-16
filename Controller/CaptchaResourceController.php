@@ -2,7 +2,7 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Controller;
 
-use Captcha\Bundle\CaptchaBundle\Config\Path;
+use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
