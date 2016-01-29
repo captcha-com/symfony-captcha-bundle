@@ -68,7 +68,7 @@ final class UserCaptchaConfiguration
     public static function execute(\Captcha $captcha, array $config)
     {
         unset($config['CaptchaId']);
-        unset($config['UserInputId']);
+        unset($config['UserInputID']);
 
         if (empty($config)) {
             return;
