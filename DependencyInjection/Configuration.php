@@ -18,6 +18,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->variableNode('captchaConfig')->defaultValue(null)->end()
+                ->booleanNode('addLayoutStylesheetInclude')->defaultTrue()->end()
             ->end()
         ;
 

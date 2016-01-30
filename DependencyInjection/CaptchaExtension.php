@@ -27,6 +27,7 @@ class CaptchaExtension extends Extension
 
         $container->setParameter('captcha.config', $config);
         $container->setParameter('captcha.config.captchaConfig', $config['captchaConfig']);
+        $container->setParameter('captcha.config.addLayoutStylesheetInclude', $config['addLayoutStylesheetInclude']);
 
         // set captcha template
         $resources = $container->getParameter('twig.form.resources');

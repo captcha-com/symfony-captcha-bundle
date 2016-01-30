@@ -77,8 +77,15 @@ class CaptchaType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        $addLayoutStylesheetInclude = $options['addLayoutStylesheetInclude'];
+
+        if (!is_bool($addLayoutStylesheetInclude)) {
+            throw new UnexpectedTypeException($addLayoutStylesheetInclude, 'boolean');
+        }
+
         $view->vars['captcha_html'] = $this->captcha->Html();
-        $view->vars['user_input_id'] = $this->captcha->get_UserInputId();
+        $view->vars['user_input_id'] = $this->captcha->UserInputID;
+        $view->vars['addLayoutStylesheetInclude'] = $addLayoutStylesheetInclude;
     }
 
     // BC for SF < 3.0

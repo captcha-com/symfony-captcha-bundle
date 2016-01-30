@@ -1,6 +1,9 @@
 {% block captcha_widget %}
     {% spaceless %}
-        <link href="{{ path('captcha_layout_stylesheet_url') }}" rel="stylesheet" />
+        {% if addLayoutStylesheetInclude %}
+            <link href="{{ path('captcha_layout_stylesheet_url') }}" rel="stylesheet" />
+        {% endif %}
+
         {{ captcha_html | raw }}
         {{ form_widget(form, { 'id': user_input_id, 'value': '' }) }}
     {% endspaceless %}
