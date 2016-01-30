@@ -28,8 +28,6 @@ final class LibraryLoader
 
     /**
      * Load BotDetect CAPTCHA Library.
-     *
-     * @param SessionInterface  $session
      */
     private static function loadBotDetectLibrary()
     {

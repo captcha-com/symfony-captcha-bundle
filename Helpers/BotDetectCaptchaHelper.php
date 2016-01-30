@@ -18,7 +18,8 @@ class BotDetectCaptchaHelper
     /**
      * Constructor.
      *
-     * @param  string  $configName
+     * @param  SessionInterface  $session
+     * @param  string            $configName
      *
      * @return void
      */
