@@ -85,5 +85,5 @@ class BotDetectCaptcha
 // static field initialization
 BotDetectCaptcha::$productInfo = array(
     'name' => 'BotDetect PHP Captcha integration for the Symfony framework',
-    'version' => '4.0.0-Dev'
+    'version' => '4.0.0'
 );
