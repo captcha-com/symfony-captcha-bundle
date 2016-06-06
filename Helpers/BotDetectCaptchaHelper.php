@@ -40,11 +40,11 @@ class BotDetectCaptchaHelper
             throw new UnexpectedTypeException($config, 'array');
         }
 
+        // save user's captcha configuration options
+        UserCaptchaConfiguration::save($config);
+
         // create a BotDetect Captcha object instance
         $this->initCaptcha($config);
-
-        // execute user's captcha configuration options
-        UserCaptchaConfiguration::execute($this->captcha, $config);
     }
 
     /**
