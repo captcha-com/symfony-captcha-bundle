@@ -65,16 +65,16 @@ final class UserCaptchaConfiguration
      */
     public static function save(array $config)
     {
-        unset($userConfig['CaptchaId']);
-        unset($userConfig['UserInputID']);
+        unset($config['CaptchaId']);
+        unset($config['UserInputID']);
 
-        if (empty($userConfig)) {
+        if (empty($config)) {
             return;
         }
 
         $settings = \CaptchaConfiguration::LoadSettings();
 
-        foreach ($userConfig as $option => $value) {
+        foreach ($config as $option => $value) {
             $settings->$option = $value;
         }
 
