@@ -5,7 +5,7 @@ use Captcha\Bundle\CaptchaBundle\Routing\Generator\UrlGenerator;
 $captchaUrlGenerator = UrlGenerator::getInstance();
 
 $BotDetect = \CaptchaConfiguration::GetSettings();
-$BotDetect->HandlerUrl =  $captchaUrlGenerator->generate('captcha_handler', array(), true);
+$BotDetect->HandlerUrl =  $captchaUrlGenerator->generate('captcha_handler', array(), \Symfony\Component\Routing\Generator\UrlGeneratorInterface::RELATIVE_PATH);
 
 // use Symfony sessions to store persist Captcha codes and other Captcha data
 $BotDetect->SaveFunctionName = 'SF_Session_Save';
