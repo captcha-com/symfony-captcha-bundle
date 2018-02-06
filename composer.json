@@ -2,7 +2,7 @@
     "name": "captcha-com/symfony-captcha-bundle",
     "type": "symfony-bundle",
     "description": "BotDetect 4 PHP Captcha generator integration for the Symfony framework.",
-    "keywords": ["captcha", "captcha bundle", "symfony captcha"],
+    "keywords": ["captcha", "captcha bundle", "symfony captcha", "captcha generator", "botdetect"],
     "homepage": "http://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html",
     "authors": [
         {
