@@ -360,7 +360,7 @@ class CaptchaHandlerController extends Controller
         // add remote scripts if enabled
         if ($this->captcha->RemoteScriptEnabled) {
             $result .= "\r\n";
-            $result .= \BDC_CaptchaScriptsHelper::GetRemoteScript($this->captcha);
+            $result .= \BDC_CaptchaScriptsHelper::GetRemoteScript($this->captcha->getCaptchaInstance());
         }
 
         // close a self-invoking functions

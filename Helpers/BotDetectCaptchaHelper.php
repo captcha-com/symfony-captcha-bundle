@@ -79,7 +79,7 @@ class BotDetectCaptchaHelper
         }
 
         if (method_exists($this->captcha->get_CaptchaBase(), $method)) {
-            call_user_func_array(array($this->captcha->get_CaptchaBase(), $method), $args);
+            return call_user_func_array(array($this->captcha->get_CaptchaBase(), $method), $args);
         }
     }
 
