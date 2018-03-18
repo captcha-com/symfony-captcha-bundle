@@ -3,19 +3,19 @@
     "type": "symfony-bundle",
     "description": "BotDetect 4 PHP Captcha generator integration for the Symfony framework.",
     "keywords": ["captcha", "captcha bundle", "symfony captcha", "captcha generator", "botdetect"],
-    "homepage": "http://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html",
+    "homepage": "https://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html",
     "authors": [
         {
             "name": "BotDetect Captcha",
             "email": "botdetect.support@captcha.com",
-            "homepage": "http://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html"
+            "homepage": "https://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html"
         }
     ],
     "support": {
         "email": "botdetect.support@captcha.com",
-        "issues": "http://captcha.com/support",
-        "forum": "http://captcha.com/support",
-        "source": "http://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html"
+        "issues": "https://captcha.com/support",
+        "forum": "https://captcha.com/support",
+        "source": "https://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html"
     },
     "require": {
         "captcha-com/captcha": "4.*",
