@@ -2,6 +2,8 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Support;
 
+use Symfony\Component\HttpKernel\Kernel;
+
 final class Path
 {
     /**
@@ -58,6 +60,10 @@ final class Path
      */
     public static function getConfigDirPath($path = '')
     {
-        return __DIR__ . '/../../../../app/config' . ($path ? '/' . $path : $path);
+        if (Kernel::VERSION < 4) {
+            return __DIR__ . '/../../../../app/config' . ($path ? '/' . $path : $path);
+        } else {
+            return __DIR__ . '/../../../../config/packages' . ($path ? '/' . $path : $path);
+        }
     }
 }

@@ -19,6 +19,7 @@
     },
     "require": {
         "captcha-com/captcha": "4.*",
+        "symfony/http-kernel": "~2.0|~3.0|~4.0",
         "php": ">=5.3.9"
     },
     "autoload": {
