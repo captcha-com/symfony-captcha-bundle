@@ -6,17 +6,17 @@ parameters:
 
 services:
     captcha:
-        class: '%botdetect_captcha.class%'
+        class: %botdetect_captcha.class%
         arguments:
             - '@service_container'
 
     captcha.routing_loader:
-        class: '%captcha_routes_loader.class%'
+        class: %captcha_routes_loader.class%
         tags:
             - { name: routing.loader }
 
     captcha.form.type:
-        class: '%captcha_type.class%'
+        class: %captcha_type.class%
         arguments:
             - '@service_container'
             - '%captcha.config%'
@@ -24,7 +24,7 @@ services:
             - { name: form.type, alias: captcha }
 
     captcha.validator:
-        class: '%valid_captcha_validator.class%'
+        class: %valid_captcha_validator.class%
         arguments:
             - '@service_container'
         tags:
