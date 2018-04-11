@@ -7,6 +7,7 @@ parameters:
 services:
     captcha:
         class: '%botdetect_captcha.class%'
+        public: true
         arguments:
             - '@service_container'
 
