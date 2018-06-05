@@ -84,13 +84,6 @@ class BotDetectCaptchaHelper
     }
 
     /**
-     * @return object
-     */
-    public function getCaptchaInstance() {
-        return $this->captcha;
-    }
-
-    /**
      * Auto-magic helpers for civilized property access.
      */
     public function __get($name)
