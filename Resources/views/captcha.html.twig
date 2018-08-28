@@ -1,7 +1,7 @@
 {% block captcha_widget %}
     {% spaceless %}
         {% if addLayoutStylesheetInclude %}
-            <link href="{{ path('captcha_layout_stylesheet_url') }}" rel="stylesheet" />
+            <link href="{{ path('captcha_handler') }}?get=bdc-layout-stylesheet.css" rel="stylesheet" />
         {% endif %}
 
         {{ captcha_html | raw }}

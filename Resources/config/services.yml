@@ -7,6 +7,7 @@ parameters:
 services:
     captcha:
         class: '%botdetect_captcha.class%'
+        public: true
         arguments:
             - '@service_container'
 
@@ -17,6 +18,7 @@ services:
 
     captcha.form.type:
         class: '%captcha_type.class%'
+        public: true
         arguments:
             - '@service_container'
             - '%captcha.config%'
@@ -25,6 +27,7 @@ services:
 
     captcha.validator:
         class: '%valid_captcha_validator.class%'
+        public: true
         arguments:
             - '@service_container'
         tags:

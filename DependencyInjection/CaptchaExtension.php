@@ -33,7 +33,7 @@ class CaptchaExtension extends Extension
         $resources = $container->getParameter('twig.form.resources');
         $container->setParameter(
             'twig.form.resources',
-            array_merge(array('CaptchaBundle::captcha.html.twig'), $resources)
+            array_merge(array('@Captcha/captcha.html.twig'), $resources)
         );
     }
 }

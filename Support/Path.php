@@ -2,6 +2,8 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Support;
 
+use Symfony\Component\HttpKernel\Kernel;
+
 final class Path
 {
     /**
@@ -50,14 +52,29 @@ final class Path
     }
 
     /**
+     * Relative path of user's captcha config file.
+     *
+     * @return string
+     */
+    public static function getRelativeConfigFilePath($file = '')
+    {
+        if (version_compare(Kernel::VERSION, '4.0', '>=')) {
+            $configDirPath = 'config/packages/';
+        } else {
+            $configDirPath = 'app/config/';
+        }
+        return $configDirPath . $file;
+    }
+
+    /**
      * Physical path of the Symfony's config directory.
      *
      * @param string  $path
      *
      * @return string
      */
-    public static function getConfigDirPath($path = '')
-    {
-        return __DIR__ . '/../../../../app/config' . ($path ? '/' . $path : $path);
+    public static function getConfigDirPath($file = '')
+    {  
+        return __DIR__ . '/../../../../'. self::getRelativeConfigFilePath($file);
     }
 }

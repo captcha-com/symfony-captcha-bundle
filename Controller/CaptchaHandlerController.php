@@ -2,7 +2,9 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Controller;
 
+use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -18,44 +20,50 @@ class CaptchaHandlerController extends Controller
      */
     public function indexAction()
     {
-        $this->captcha = $this->getBotDetectCaptchaInstance();
+        if ($this->isGetResourceContentsRequest()) {
+            // getting contents of css, js, and gif files.
+            return $this->getResourceContents();
+        } else {
+            
+            $this->captcha = $this->getBotDetectCaptchaInstance();
 
-        if (is_null($this->captcha)) {
-            throw new BadRequestHttpException('captcha');
-        }
+            if (is_null($this->captcha)) {
+                throw new BadRequestHttpException('captcha');
+            }
 
-        $commandString = $this->getUrlParameter('get');
-        if (!\BDC_StringHelper::HasValue($commandString)) {
-            \BDC_HttpHelper::BadRequest('command');
-        }
-
-        $commandString = \BDC_StringHelper::Normalize($commandString);
-        $command = \BDC_CaptchaHttpCommand::FromQuerystring($commandString);
-        $responseBody = '';
-        switch ($command) {
-            case \BDC_CaptchaHttpCommand::GetImage:
-                $responseBody = $this->getImage();
-                break;
-            case \BDC_CaptchaHttpCommand::GetSound:
-                $responseBody = $this->getSound();
-                break;
-            case \BDC_CaptchaHttpCommand::GetValidationResult:
-                $responseBody = $this->getValidationResult();
-                break;
-            case \BDC_CaptchaHttpCommand::GetInitScriptInclude:
-                $responseBody = $this->getInitScriptInclude();
-                break;
-            case \BDC_CaptchaHttpCommand::GetP:
-                $responseBody = $this->getP();
-                break;
-            default:
+            $commandString = $this->getUrlParameter('get');
+            if (!\BDC_StringHelper::HasValue($commandString)) {
                 \BDC_HttpHelper::BadRequest('command');
-                break;
-        }
+            }
 
-        // disallow audio file search engine indexing
-        header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
-        echo $responseBody; exit;
+            $commandString = \BDC_StringHelper::Normalize($commandString);
+            $command = \BDC_CaptchaHttpCommand::FromQuerystring($commandString);
+            $responseBody = '';
+            switch ($command) {
+                case \BDC_CaptchaHttpCommand::GetImage:
+                    $responseBody = $this->getImage();
+                    break;
+                case \BDC_CaptchaHttpCommand::GetSound:
+                    $responseBody = $this->getSound();
+                    break;
+                case \BDC_CaptchaHttpCommand::GetValidationResult:
+                    $responseBody = $this->getValidationResult();
+                    break;
+                case \BDC_CaptchaHttpCommand::GetScriptInclude:
+                    $responseBody = $this->getScriptInclude();
+                    break;
+                case \BDC_CaptchaHttpCommand::GetP:
+                    $responseBody = $this->getP();
+                    break;
+                default:
+                    \BDC_HttpHelper::BadRequest('command');
+                    break;
+            }
+
+            // disallow audio file search engine indexing
+            header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
+            echo $responseBody; exit;
+        }
     }
 
     /**
@@ -79,6 +87,34 @@ class CaptchaHandlerController extends Controller
         return new BotDetectCaptchaHelper($this->get('session'), $captchaId, $captchaInstanceId);
     }
 
+    /**
+     * Get contents of Captcha resources (js, css, gif files).
+     *
+     * @return string
+     */
+    public function getResourceContents()
+    {
+        $filename = $this->getUrlParameter('get');
+
+        if (!preg_match('/^[a-z-]+\.(css|gif|js)$/', $filename)) {
+            throw new BadRequestHttpException('Invalid file name.');
+        }
+
+        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . $filename);
+
+        if (!is_file($resourcePath)) {
+            throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $filename));
+        }
+
+        $mimesType = array('css' => 'text/css', 'gif' => 'image/gif', 'js'  => 'application/x-javascript');
+        $fileInfo = pathinfo($resourcePath);
+
+        return new Response(
+            file_get_contents($resourcePath),
+            200,
+            array('content-type' => $mimesType[$fileInfo['extension']])
+        );
+    }
 
     /**
      * Generate a Captcha image.
@@ -322,7 +358,7 @@ class CaptchaHandlerController extends Controller
         return $resultJson;
     }
 
-    public function getInitScriptInclude() {
+    public function getScriptInclude() {
         // saved data for the specified Captcha object in the application
         if (is_null($this->captcha)) {
             \BDC_HttpHelper::BadRequest('captcha');
@@ -338,20 +374,25 @@ class CaptchaHandlerController extends Controller
         header('Content-Type: text/javascript');
         header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
 
-        $result = "(function() {\r\n";
+        // 1. load BotDetect script
+        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-traditional-api-script-include.js');
 
-        // add init script
-        $result .= \BDC_CaptchaScriptsHelper::GetInitScriptMarkup($this->captcha, $instanceId);
+        if (!is_file($resourcePath)) {
+            throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $resourcePath));
+        }
+
+        $script = file_get_contents($resourcePath);
+
+        // 2. load BotDetect Init script
+        $script .= \BDC_CaptchaScriptsHelper::GetInitScriptMarkup($this->captcha, $instanceId);
 
         // add remote scripts if enabled
         if ($this->captcha->RemoteScriptEnabled) {
-            $result .= "\r\n";
-            $result .= \BDC_CaptchaScriptsHelper::GetRemoteScript($this->captcha);
+            $script .= "\r\n";
+            $script .= \BDC_CaptchaScriptsHelper::GetRemoteScript($this->captcha);
         }
 
-        // close a self-invoking functions
-        $result .= "\r\n})();";
-        return $result;
+        return $script;
     }
 
     /**
@@ -402,6 +443,14 @@ class CaptchaHandlerController extends Controller
     {
         $resultStr = ($result ? 'true': 'false');
         return $resultStr;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isGetResourceContentsRequest()
+    {
+        return array_key_exists('get', $_GET) && !array_key_exists('c', $_GET);
     }
 
     /**

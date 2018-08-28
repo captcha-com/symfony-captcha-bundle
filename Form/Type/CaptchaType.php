@@ -2,6 +2,7 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Form\Type;
 
+use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -60,7 +61,8 @@ class CaptchaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!isset($options['captchaConfig']) || '' === $options['captchaConfig']) {
-            $errorMessage  = 'The Captcha field type requires you to declare the "captchaConfig" option and assigns a captcha configuration key that defined in app/config/captcha.php file. ';
+            $path = Path::getRelativeConfigFilePath('captcha.php');
+            $errorMessage  = 'The Captcha field type requires you to declare the "captchaConfig" option and assigns a captcha configuration key that defined in ' . $path . ' file. ';
             $errorMessage .= 'For example: $builder->add(\'captchaCode\', CaptchaType::class, array(\'captchaConfig\' => \'LoginCaptcha\'))';
             throw new InvalidArgumentException($errorMessage);
         }

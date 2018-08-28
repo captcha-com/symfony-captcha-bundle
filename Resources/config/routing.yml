@@ -1,13 +1,3 @@
-captcha_resource:
-    path: /captcha-resource/{filename}
-    defaults: { _controller: CaptchaBundle:CaptchaResource:index, filename: none }
-    methods: [GET]
-
-captcha_layout_stylesheet_url:
-    path: /captcha-resource/bdc-layout-stylesheet.css
-    defaults: { _controller: CaptchaBundle:CaptchaResource:index, filename: bdc-layout-stylesheet.css }
-    methods: [GET]
-
 captcha_handler:
     path: /captcha-handler
     defaults: { _controller: CaptchaBundle:CaptchaHandler:index }

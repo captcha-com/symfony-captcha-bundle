@@ -15,7 +15,7 @@ $BDC_Include_Path = __DIR__ . '/../../captcha/lib/botdetect/';
 
 // BotDetect Url prefix (base Url of the BotDetect public resources)
 $captchaUrlGenerator = \Captcha\Bundle\CaptchaBundle\Routing\Generator\UrlGenerator::getInstance();
-$BDC_Url_Root = $captchaUrlGenerator->generate('captcha_resource', array(), \Symfony\Component\Routing\Generator\UrlGeneratorInterface::RELATIVE_PATH);
+$BDC_Url_Root = $captchaUrlGenerator->generate('captcha_handler', array(), \Symfony\Component\Routing\Generator\UrlGeneratorInterface::RELATIVE_PATH) . '?get=';
 
 // physical path to the folder with the (optional!) config override file
 $BDC_Config_Override_Path = __DIR__;
@@ -29,7 +29,7 @@ if (is_file(__DIR__ . '/botdetect/CaptchaIncludes.php')) {
 } else {
   // clean-up path specifications
   $BDC_Include_Path = BDC_NormalizePath($BDC_Include_Path);
-  $BDC_Url_Root = BDC_NormalizePath($BDC_Url_Root);
+  $BDC_Url_Root = rtrim(BDC_NormalizePath($BDC_Url_Root), '/');
   $BDC_Config_Override_Path = BDC_NormalizePath($BDC_Config_Override_Path);
 }
 define('BDC_INCLUDE_PATH', $BDC_Include_Path);

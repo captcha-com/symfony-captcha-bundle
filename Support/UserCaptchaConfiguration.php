@@ -4,6 +4,7 @@ namespace Captcha\Bundle\CaptchaBundle\Support;
 
 use Captcha\Bundle\CaptchaBundle\Support\Exception\FileNotFoundException;
 use Captcha\Bundle\CaptchaBundle\Support\Path;
+use Symfony\Component\HttpKernel\Kernel;
 
 final class UserCaptchaConfiguration
 {
@@ -49,7 +50,8 @@ final class UserCaptchaConfiguration
         $configPath = Path::getConfigDirPath('captcha.php');
 
         if (!file_exists($configPath)) {
-            throw new FileNotFoundException('File "app/config/captcha.php" could not be found.');
+            $path = Path::getRelativeConfigFilePath('captcha.php');
+            throw new FileNotFoundException(sprintf('File "%s" could not be found.', $path));
         }
 
         $captchaConfigs = require $configPath;
