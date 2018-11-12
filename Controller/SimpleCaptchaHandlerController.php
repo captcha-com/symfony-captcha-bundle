@@ -113,9 +113,11 @@ class SimpleCaptchaHandlerController extends Controller
         }
 
         $captchaId = $this->getUrlParameter('t');
-        if (is_null($captchaId) || !(32 == strlen($captchaId) &&
-            (1 === preg_match("/^([a-f0-9]+)$/u", $captchaId)))) {
-            return null;
+        if ($captchaId !== null) {
+            $captchaId = \BDC_StringHelper::Normalize($captchaId);
+            if (1 !== preg_match(\BDC_SimpleCaptchaBase::VALID_CAPTCHA_ID, $captchaId)) {
+                return null;
+            }
         }
 
         return new BotDetectSimpleCaptchaHelper($captchaStyleName, $captchaId);
@@ -421,7 +423,6 @@ class SimpleCaptchaHandlerController extends Controller
         $corsAuth = new \CorsAuth();
         if (!$corsAuth->IsClientAllowed()) {
             \BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
-            return null;
         }
 
         $html = "<div>" . $this->captcha->Html() . "</div>";
@@ -464,7 +465,6 @@ class SimpleCaptchaHandlerController extends Controller
         $result = false;
         if (isset($userInput) && (isset($captchaId))) {
             $result = $this->captcha->AjaxValidate($userInput, $captchaId);
-            $this->captcha->CaptchaBase->Save();
         }
         $resultJson = $this->getJsonValidationResult($result);
 

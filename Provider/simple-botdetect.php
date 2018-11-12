@@ -21,8 +21,7 @@ $BDC_Configuration_Cache_Path = sys_get_temp_dir() . '/bd_cache/';
 
 // The relative URL of your form to this file
 $captchaUrlGenerator = \Captcha\Bundle\CaptchaBundle\Routing\Generator\UrlGenerator::getInstance();
-$BDC_Handler_Path = $captchaUrlGenerator->generate('simple_captcha_handler', array(), \Symfony\Component\Routing\Generator\UrlGeneratorInterface::RELATIVE_PATH);
-
+$BDC_Handler_Path = $captchaUrlGenerator->generate('simple_captcha_handler', array(), \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_PATH);
 
 // BotDetect Url prefix (base Url of the BotDetect public resources)
 $BDC_Url_Root = $BDC_Include_Path . 'public/';

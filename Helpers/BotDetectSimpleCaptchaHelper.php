@@ -36,6 +36,9 @@ class BotDetectSimpleCaptchaHelper
      */
     public function initCaptcha($captchaStyleName, $captchaId = null)
     {
+        if (($captchaStyleName === null) || ($captchaStyleName === '')) {
+            $captchaStyleName = 'defaultCaptcha';
+        }
         $this->captcha = new \SimpleCaptcha($captchaStyleName, $captchaId);
     }
 
