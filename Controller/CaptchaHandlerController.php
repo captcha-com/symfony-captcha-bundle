@@ -3,6 +3,7 @@
 namespace Captcha\Bundle\CaptchaBundle\Controller;
 
 use Captcha\Bundle\CaptchaBundle\Support\Path;
+use Captcha\Bundle\CaptchaBundle\Support\LibraryLoader;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -73,6 +74,10 @@ class CaptchaHandlerController extends Controller
      */
     private function getBotDetectCaptchaInstance()
     {
+        // load BotDetect Library
+        $libraryLoader = new LibraryLoader($this->container);
+        $libraryLoader->load();
+
         $captchaId = $this->getUrlParameter('c');
         if (is_null($captchaId) || !preg_match('/^(\w+)$/ui', $captchaId)) {
             throw new BadRequestHttpException('Invalid captcha id.');
@@ -84,7 +89,7 @@ class CaptchaHandlerController extends Controller
             throw new BadRequestHttpException('Invalid instance id.');
         }
 
-        return new BotDetectCaptchaHelper($this->get('session'), $captchaId, $captchaInstanceId);
+        return new BotDetectCaptchaHelper($captchaId, $captchaInstanceId);
     }
 
     /**
@@ -100,7 +105,7 @@ class CaptchaHandlerController extends Controller
             throw new BadRequestHttpException('Invalid file name.');
         }
 
-        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . $filename);
+        $resourcePath = realpath(Path::getPublicDirPathInLibrary($this->container) . $filename);
 
         if (!is_file($resourcePath)) {
             throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $filename));
@@ -230,7 +235,8 @@ class CaptchaHandlerController extends Controller
 
     }
 
-    public function getSoundData($p_Captcha, $p_InstanceId) {
+    public function getSoundData($p_Captcha, $p_InstanceId)
+    {
         $shouldCache = (
             ($p_Captcha->SoundRegenerationMode == \SoundRegenerationMode::None) || // no sound regeneration allowed, so we must cache the first and only generated sound
             $this->detectIosRangeRequest() // keep the same Captcha sound across all chunked iOS requests
@@ -252,29 +258,33 @@ class CaptchaHandlerController extends Controller
         return $soundBytes;
     }
 
-    private function generateSoundData($p_Captcha, $p_InstanceId) {
+    private function generateSoundData($p_Captcha, $p_InstanceId)
+    {
         $rawSound = $p_Captcha->CaptchaBase->GetSound($p_InstanceId);
         $p_Captcha->CaptchaBase->SaveCodeCollection(); // always record sound generation count
         return $rawSound;
     }
 
-    private function saveSoundData($p_InstanceId, $p_SoundBytes) {
+    private function saveSoundData($p_InstanceId, $p_SoundBytes)
+    {
         SF_Session_Save("BDC_Cached_SoundData_" . $p_InstanceId, $p_SoundBytes);
     }
 
-    private function loadSoundData($p_InstanceId) {
+    private function loadSoundData($p_InstanceId)
+    {
         return SF_Session_Load("BDC_Cached_SoundData_" . $p_InstanceId);
     }
 
-    private function clearSoundData($p_InstanceId) {
+    private function clearSoundData($p_InstanceId)
+    {
         SF_Session_Clear("BDC_Cached_SoundData_" . $p_InstanceId);
     }
 
 
     // Instead of relying on unreliable user agent checks, we detect the iOS sound
     // requests by the Http headers they will always contain
-    private function detectIosRangeRequest() {
-
+    private function detectIosRangeRequest()
+    {
         if (array_key_exists('HTTP_RANGE', $_SERVER) &&
             \BDC_StringHelper::HasValue($_SERVER['HTTP_RANGE'])) {
 
@@ -297,7 +307,8 @@ class CaptchaHandlerController extends Controller
         return false;
     }
 
-    private function getSoundByteRange() {
+    private function getSoundByteRange()
+    {
         // chunked requests must include the desired byte range
         $rangeStr = $_SERVER['HTTP_RANGE'];
         if (!\BDC_StringHelper::HasValue($rangeStr)) {
@@ -312,7 +323,8 @@ class CaptchaHandlerController extends Controller
         );
     }
 
-    private function detectFakeRangeRequest() {
+    private function detectFakeRangeRequest()
+    {
         $detected = false;
         if (array_key_exists('HTTP_RANGE', $_SERVER)) {
             $rangeStr = $_SERVER['HTTP_RANGE'];
@@ -358,7 +370,8 @@ class CaptchaHandlerController extends Controller
         return $resultJson;
     }
 
-    public function getScriptInclude() {
+    public function getScriptInclude()
+    {
         // saved data for the specified Captcha object in the application
         if (is_null($this->captcha)) {
             \BDC_HttpHelper::BadRequest('captcha');
@@ -375,7 +388,7 @@ class CaptchaHandlerController extends Controller
         header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
 
         // 1. load BotDetect script
-        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-traditional-api-script-include.js');
+        $resourcePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-traditional-api-script-include.js');
 
         if (!is_file($resourcePath)) {
             throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $resourcePath));

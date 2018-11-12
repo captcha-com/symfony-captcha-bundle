@@ -1,12 +1,21 @@
 parameters:
     botdetect_captcha.class: Captcha\Bundle\CaptchaBundle\Integration\BotDetectCaptcha
+    botdetect_simple_captcha.class: Captcha\Bundle\CaptchaBundle\Integration\BotDetectSimpleCaptcha
     captcha_routes_loader.class: Captcha\Bundle\CaptchaBundle\Routing\CaptchaRoutesLoader
     captcha_type.class: Captcha\Bundle\CaptchaBundle\Form\Type\CaptchaType
+    simple_captcha_type.class: Captcha\Bundle\CaptchaBundle\Form\Type\SimpleCaptchaType
     valid_captcha_validator.class: Captcha\Bundle\CaptchaBundle\Validator\Constraints\ValidCaptchaValidator
+    valid_simple_captcha_validator.class: Captcha\Bundle\CaptchaBundle\Validator\Constraints\ValidSimpleCaptchaValidator
 
 services:
     captcha:
         class: '%botdetect_captcha.class%'
+        public: true
+        arguments:
+            - '@service_container'
+    
+    simple_captcha:
+        class: '%botdetect_simple_captcha.class%'
         public: true
         arguments:
             - '@service_container'
@@ -25,6 +34,15 @@ services:
         tags:
             - { name: form.type, alias: captcha }
 
+    simple_captcha.form.type:
+        class: '%simple_captcha_type.class%'
+        public: true
+        arguments:
+            - '@service_container'
+            - '%captcha.config%'
+        tags:
+            - { name: form.type, alias: captcha }
+
     captcha.validator:
         class: '%valid_captcha_validator.class%'
         public: true
@@ -32,3 +50,11 @@ services:
             - '@service_container'
         tags:
             - { name: validator.constraint_validator, alias: valid_captcha }
+
+    simple_captcha.validator:
+        class: '%valid_simple_captcha_validator.class%'
+        public: true
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: validator.constraint_validator, alias: valid_simple_captcha }

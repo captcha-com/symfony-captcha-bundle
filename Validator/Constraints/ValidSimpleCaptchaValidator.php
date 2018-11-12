@@ -2,13 +2,13 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Validator\Constraints;
 
-use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
+use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectSimpleCaptchaHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class ValidCaptchaValidator extends ConstraintValidator
+class ValidSimpleCaptchaValidator extends ConstraintValidator
 {
     /**
      * @var object
@@ -28,10 +28,10 @@ class ValidCaptchaValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        $captcha = $this->container->get('captcha')->getInstance();
+        $captcha = $this->container->get('simple_captcha')->getInstance();
 
-        if (!$captcha instanceof BotDetectCaptchaHelper) {
-            throw new UnexpectedTypeException($captcha, 'Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper');
+        if (!$captcha instanceof BotDetectSimpleCaptchaHelper) {
+            throw new UnexpectedTypeException($captcha, 'Captcha\Bundle\CaptchaBundle\Helpers\BotDetectSimpleCaptchaHelper');
         }
 
         if (!$captcha->Validate($value)) {

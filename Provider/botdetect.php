@@ -9,9 +9,11 @@ if (!defined('__DIR__')) { define('__DIR__', dirname(__FILE__)); }
 
 
 // 1. define BotDetect paths
+global $libPath; // this one is passed from LibraryLoader class
+$libPath = $includeData;
 
 // physical path to Captcha library files (the BotDetect folder)
-$BDC_Include_Path = __DIR__ . '/../../captcha/lib/botdetect/';
+$BDC_Include_Path = realpath($libPath . '/botdetect');
 
 // BotDetect Url prefix (base Url of the BotDetect public resources)
 $captchaUrlGenerator = \Captcha\Bundle\CaptchaBundle\Routing\Generator\UrlGenerator::getInstance();

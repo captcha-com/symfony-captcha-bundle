@@ -6,17 +6,12 @@ use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Support\Exception\FileNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LibraryLoader
+class SimpleLibraryLoader
 {
     /*
      * @var object
      */
     private $container;
-
-    /*
-     * @var object
-     */
-    private $session;
 
     /**
      * Constructor.
@@ -26,7 +21,6 @@ class LibraryLoader
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->session = $this->container->get('session');
     }
 
     /**
@@ -36,9 +30,6 @@ class LibraryLoader
     {
         // load bd php library
         self::loadBotDetectLibrary();
-
-        // load the captcha configuration defaults
-        self::loadCaptchaConfigDefaults();
     }
 
     /**
@@ -47,22 +38,12 @@ class LibraryLoader
     private function loadBotDetectLibrary()
     {
         $libPath = Path::getCaptchaLibPath($this->container);
-        
+
         if (!self::isLibraryFound($libPath)) {
             throw new FileNotFoundException(sprintf('The BotDetect Captcha library could not be found in %s.', $libPath));
         }
-
-        self::includeFile(Path::getBotDetectFilePath(), true, $libPath);
-    }
-
-    /**
-     * Load the captcha configuration defaults.
-     *
-     * @param SessionInterface  $session
-     */
-    private function loadCaptchaConfigDefaults()
-    {
-        self::includeFile(Path::getCaptchaConfigDefaultsFilePath(), true, $this->session);
+        
+        self::includeFile(Path::getSimpleBotDetectFilePath(), true, $libPath);
     }
 
     /**

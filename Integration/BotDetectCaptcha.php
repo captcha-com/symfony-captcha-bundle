@@ -2,9 +2,9 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Integration;
 
+use Captcha\Bundle\CaptchaBundle\Support\LibraryLoader;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class BotDetectCaptcha
 {
@@ -40,32 +40,32 @@ class BotDetectCaptcha
      */
     public function setConfig($configName)
     {
-        return $this->getCaptchaInstance(
-            $this->container->get('session'),
-            $configName
-        );
+        return $this->getInstance($configName);
     }
 
     /**
      * @return bool
      */
-    private function captchaInstanceAlreadyCreated()
+    private function isInstanceCreated()
     {
         return isset($this->captcha);
     }
 
-    /*
+    /**
      * Get an instance of the Captcha class.
      * 
-     * @param SessionInterface  $session
-     * @param string            $configName
+     * @param string  $configName
      * 
      * @return object
      */
-    public function getCaptchaInstance(SessionInterface $session = null, $configName = '')
+    public function getInstance($configName = '')
     {
-        if (!$this->captchaInstanceAlreadyCreated()) {
-            $this->captcha = new BotDetectCaptchaHelper($session, $configName);
+        if (!$this->isInstanceCreated()) {
+            // load BotDetect Library
+            $libraryLoader = new LibraryLoader($this->container);
+            $libraryLoader->load();
+
+            $this->captcha = new BotDetectCaptchaHelper($configName);
         }
 
         return $this->captcha;

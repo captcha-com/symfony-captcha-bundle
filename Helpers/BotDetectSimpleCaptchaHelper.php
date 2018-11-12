@@ -2,12 +2,10 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Helpers;
 
-use Captcha\Bundle\CaptchaBundle\Support\LibraryLoader;
-use Captcha\Bundle\CaptchaBundle\Support\UserCaptchaConfiguration;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class BotDetectCaptchaHelper
+class BotDetectSimpleCaptchaHelper
 {
     /**
      * @var object
@@ -17,48 +15,28 @@ class BotDetectCaptchaHelper
     /**
      * Constructor.
      *
-     * @param  string  $configName
+     * @param  string  $captchaStyleName
+     * @param  string  $captchaId
      *
      * @return void
      */
-    public function __construct($configName, $captchaInstanceId = null)
+    public function __construct($captchaStyleName, $captchaId = null)
     {
-        // get captcha config
-        $captchaId = $configName;
-        $config = UserCaptchaConfiguration::get($captchaId);
-
-        if (null === $config) {
-            throw new InvalidArgumentException(sprintf('The "%s" option could not be found in app/config/captcha.php file.', $captchaId));
-        }
-
-        if (!is_array($config)) {
-            throw new UnexpectedTypeException($config, 'array');
-        }
-
-        // save user's captcha configuration options
-        UserCaptchaConfiguration::save($config);
-
-        // create a BotDetect Captcha object instance
-        $this->initCaptcha($config, $captchaInstanceId);
+        // create a BotDetect SimpleCaptcha object instance
+        $this->initCaptcha($captchaStyleName, $captchaId);
     }
 
     /**
-     * Initialize CAPTCHA object instance.
+     * Initialize SimpleCaptcha object instance.
      *
-     * @param  array  $config
+     * @param  string  $captchaStyleName
+     * @param  string  $captchaId
      * 
      * @return void
      */
-    public function initCaptcha(array $config, $captchaInstanceId = null)
+    public function initCaptcha($captchaStyleName, $captchaId = null)
     {
-        // set captchaId and create an instance of Captcha
-        $captchaId = (array_key_exists('CaptchaId', $config)) ? $config['CaptchaId'] : 'defaultCaptchaId';
-        $this->captcha = new \Captcha($captchaId, $captchaInstanceId);
-
-        // set user's input id
-        if (array_key_exists('UserInputID', $config)) {
-            $this->captcha->UserInputID = $config['UserInputID'];
-        }
+        $this->captcha = new \SimpleCaptcha($captchaStyleName, $captchaId);
     }
 
     public function __call($method, $args = array())

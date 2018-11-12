@@ -3,6 +3,7 @@
 namespace Captcha\Bundle\CaptchaBundle\Support;
 
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final class Path
 {
@@ -12,23 +13,35 @@ final class Path
     private function __construct() {}
 
     /**
+     * Physical path of the captchal library package. 
+     * 
+     * @param ContainerInterface  $container
+     */
+    public static function getCaptchaLibPath(ContainerInterface $container)
+    {
+        $libPath = $container->getParameter('captcha.config.lib_path');
+        $libPath = rtrim($libPath, '/');
+        return $libPath;
+    }
+
+    /**
      * Physical path of the captcha-com/captcha package.
      *
      * @return string
      */
-    public static function getLibPackageDirPath()
+    public static function getDefaultLibPackageDirPath()
     {
-        return __DIR__ . '/../../captcha/';
+        return __DIR__ . '/../../captcha/lib/';
     }
 
     /**
-     * Physical path of public directory which is located inside the captcha-com/captcha package.
+     * Physical path of public directory which is located inside the captcha package.
      *
      * @return string
      */
-    public static function getPublicDirPathInLibrary()
+    public static function getPublicDirPathInLibrary(ContainerInterface $container)
     {
-        return self::getLibPackageDirPath() . 'lib/botdetect/public/';
+        return self::getCaptchaLibPath($container) . '/botdetect/public/';
     }
 
     /**
@@ -39,6 +52,16 @@ final class Path
     public static function getBotDetectFilePath()
     {
         return __DIR__ . '/../Provider/botdetect.php';
+    }
+
+    /**
+     * Physical path of simple-botdetect.php file.
+     *
+     * @return string
+     */
+    public static function getSimpleBotDetectFilePath()
+    {
+        return __DIR__ . '/../Provider/simple-botdetect.php';
     }
 
     /**

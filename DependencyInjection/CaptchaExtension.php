@@ -22,11 +22,13 @@ class CaptchaExtension extends Extension
         $loader->load('services.yml');
 
         // set captcha configuration
-        $configuration = new Configuration($configs);
+        $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('captcha.config', $config);
+        $container->setParameter('captcha.config.lib_path', $config['lib_path']);
         $container->setParameter('captcha.config.captchaConfig', $config['captchaConfig']);
+        $container->setParameter('captcha.config.captchaStyleName', $config['captchaStyleName']);
         $container->setParameter('captcha.config.addLayoutStylesheetInclude', $config['addLayoutStylesheetInclude']);
 
         // set captcha template
