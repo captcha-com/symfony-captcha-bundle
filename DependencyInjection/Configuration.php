@@ -20,7 +20,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->variableNode('lib_path')->defaultValue($captchaLibPathDefault)->end()
+                ->variableNode('botdetect_captcha_path')->defaultValue($captchaLibPathDefault)->end()
                 ->variableNode('captchaConfig')->defaultValue(null)->end()
                 ->variableNode('captchaStyleName')->defaultValue(null)->end()
                 ->booleanNode('addLayoutStylesheetInclude')->defaultTrue()->end()

@@ -19,7 +19,7 @@ final class Path
      */
     public static function getCaptchaLibPath(ContainerInterface $container)
     {
-        $libPath = $container->getParameter('captcha.config.lib_path');
+        $libPath = $container->getParameter('captcha.config.botdetect_captcha_path');
         $libPath = rtrim($libPath, '/');
         return $libPath;
     }
