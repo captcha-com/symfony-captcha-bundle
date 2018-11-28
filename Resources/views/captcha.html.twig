@@ -7,10 +7,6 @@
 
 {% block captcha_widget %}
     {% spaceless %}
-        {% if addLayoutStylesheetInclude %}
-            <link href="{{ path('captcha_handler') }}?get=bdc-layout-stylesheet.css" rel="stylesheet" />
-        {% endif %}
-
         {{ captcha_html | raw }}
         {{ form_widget(form, { 'id': user_input_id, 'value': '' }) }}
     {% endspaceless %}

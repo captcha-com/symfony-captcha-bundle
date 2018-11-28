@@ -3,9 +3,11 @@
 namespace Captcha\Bundle\CaptchaBundle\Helpers;
 
 use Captcha\Bundle\CaptchaBundle\Support\LibraryLoader;
+use Captcha\Bundle\CaptchaBundle\Routing\Generator\UrlGenerator;
 use Captcha\Bundle\CaptchaBundle\Support\UserCaptchaConfiguration;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BotDetectCaptchaHelper
 {
@@ -59,6 +61,18 @@ class BotDetectCaptchaHelper
         if (array_key_exists('UserInputID', $config)) {
             $this->captcha->UserInputID = $config['UserInputID'];
         }
+    }
+
+    /**
+     * Override Captcha's Html method.
+     * Add stylesheet css into Captcha html markup.
+     */
+    public function Html()
+    {
+        $captchaUrlGenerator = UrlGenerator::getInstance();
+        $html  = \BDC_HtmlHelper::StylesheetInclude($captchaUrlGenerator->generate('captcha_handler', array(), UrlGeneratorInterface::RELATIVE_PATH) . '?get=bdc-layout-stylesheet.css');
+        $html .= $this->captcha->Html();
+        return $html;
     }
 
     public function __call($method, $args = array())
