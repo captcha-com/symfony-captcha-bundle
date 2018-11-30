@@ -191,7 +191,7 @@ class SimpleCaptchaHandlerController extends Controller
         $imageType = strtolower($imageType[0]);
         $mimeType = "image/" . $imageType;
 
-        $rawImage = $this->getImageData($captcha);
+        $rawImage = $this->getImageData($this->captcha);
 
         $base64ImageString = sprintf('data:%s;base64,%s', $mimeType, base64_encode($rawImage));
         return $base64ImageString;
