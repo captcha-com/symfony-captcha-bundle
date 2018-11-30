@@ -157,7 +157,9 @@ class SimpleCaptchaHandlerController extends Controller
         \BDC_HttpHelper::DisallowCache();
 
         // response MIME type & headers
-        $mimeType = $this->captcha->CaptchaBase->ImageMimeType;
+        $imageType = \ImageFormat::GetName($this->captcha->ImageFormat);
+        $imageType = strtolower($imageType[0]);
+        $mimeType = "image/" . $imageType;
         header("Content-Type: {$mimeType}");
 
         // we don't support content chunking, since image files
