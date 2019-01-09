@@ -81,7 +81,7 @@ class SimpleCaptchaType extends AbstractType
     // BC for SF < 3.0
     public function getName()
     {
-        return 'captcha';
+        return 'simple_captcha';
     }
 
     /**
