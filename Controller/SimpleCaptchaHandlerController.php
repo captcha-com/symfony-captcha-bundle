@@ -5,11 +5,10 @@ namespace Captcha\Bundle\CaptchaBundle\Controller;
 use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Support\SimpleLibraryLoader;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectSimpleCaptchaHelper;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class SimpleCaptchaHandlerController extends Controller
+class SimpleCaptchaHandlerController extends AbstractController
 {
     /**
      * @var object
@@ -22,7 +21,7 @@ class SimpleCaptchaHandlerController extends Controller
     public function indexAction()
     {
         $this->captcha = $this->getBotDetectCaptchaInstance();
-        
+
         $commandString = $this->getUrlParameter('get');
         if (!\BDC_StringHelper::HasValue($commandString)) {
             \BDC_HttpHelper::BadRequest('command');
@@ -61,7 +60,7 @@ class SimpleCaptchaHandlerController extends Controller
             case \BDC_SimpleCaptchaHttpCommand::GetSoundSmallDisabledIcon:
                 $responseBody = $this->getSmallDisabledSoundIcon();
                 break;
-            
+
                 // Reload icon
             case \BDC_SimpleCaptchaHttpCommand::GetReloadIcon:
                 $responseBody = $this->getReloadIcon();
@@ -106,7 +105,7 @@ class SimpleCaptchaHandlerController extends Controller
         // load BotDetect Library
         $libraryLoader = new SimpleLibraryLoader($this->container);
         $libraryLoader->load();
-        
+
         $captchaStyleName = $this->getUrlParameter('c');
         if (is_null($captchaStyleName) || !preg_match('/^(\w+)$/ui', $captchaStyleName)) {
             return null;
@@ -177,14 +176,14 @@ class SimpleCaptchaHandlerController extends Controller
     public function getBase64ImageString()
     {
         header("Access-Control-Allow-Origin: *");
-  
+
         // authenticate client-side request
         $corsAuth = new \CorsAuth();
         if (!$corsAuth->IsClientAllowed()) {
             \BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
             return null;
         }
-        
+
 
         // MIME type
         $imageType = \ImageFormat::GetName($this->captcha->ImageFormat);
@@ -205,28 +204,28 @@ class SimpleCaptchaHandlerController extends Controller
         if (is_null($captchaId)) {
           \BDC_HttpHelper::BadRequest('Captcha Id doesn\'t exist');
         }
-      
+
         if ($this->isObviousBotRequest($p_Captcha)) {
           return;
         }
-      
+
         // image generation invalidates sound cache, if any
         $this->clearSoundData($p_Captcha, $captchaId);
-      
+
         // response headers
         \BDC_HttpHelper::DisallowCache();
-      
+
         // we don't support content chunking, since image files
         // are regenerated randomly on each request
         header('Accept-Ranges: none');
-      
+
         // disallow audio file search engine indexing
         header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
-      
+
         // image generation
         $rawImage = $p_Captcha->CaptchaBase->GetImage($captchaId);
         $p_Captcha->SaveCode($captchaId, $p_Captcha->CaptchaBase->Code); // record generated Captcha code for validation
-      
+
         return $rawImage;
     }
 
@@ -585,22 +584,22 @@ class SimpleCaptchaHandlerController extends Controller
         if ($hasEtag) {
             \BDC_HttpHelper::AllowEtagCache($p_Resource);
         }
-      
+
         return file_get_contents($p_Resource);
     }
 
     private function isObviousBotRequest($p_Captcha)
     {
         $captchaRequestValidator = new \SimpleCaptchaRequestValidator($p_Captcha->Configuration);
-      
-      
+
+
         // some basic request checks
         $captchaRequestValidator->RecordRequest();
-      
+
         if ($captchaRequestValidator->IsObviousBotAttempt()) {
           \BDC_HttpHelper::TooManyRequests('IsObviousBotAttempt');
         }
-      
+
         return false;
       }
 
@@ -619,7 +618,7 @@ class SimpleCaptchaHandlerController extends Controller
         if (strlen($captchaId) != 32) {
             return null;
         }
-        
+
         if (1 !== preg_match(\BDC_SimpleCaptchaBase::VALID_CAPTCHA_ID, $captchaId)) {
             return null;
         }
