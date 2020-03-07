@@ -8,22 +8,22 @@
 
 ## BotDetect Symfony CAPTCHA integration on captcha.com
 
-* [BotDetect Symfony CAPTCHA Integration Quickstart](https://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html)
-* [How to Add BotDetect PHP CAPTCHA Protection to Symfony Application](https://captcha.com/doc/php/howto/symfony-captcha-bundle.html)
-* [Symfony Basic BotDetect CAPTCHA Example](https://captcha.com/doc/php/examples/symfony-basic-captcha-bundle-example.html)
-* [Symfony Form Validation BotDetect CAPTCHA Example](https://captcha.com/doc/php/examples/symfony-form-validation-captcha-bundle-example.html)
-* [Symfony FOSUserBundle CAPTCHA Example](https://captcha.com/doc/php/examples/symfony-fosuserbundle-captcha-example.html)
+* [Symfony Captcha Integration Quickstart](https://captcha.com/doc/php/symfony-captcha-bundle-quickstart.html)
+* [Symfony Application](https://captcha.com/doc/php/howto/symfony-captcha-bundle.html)
+* [Symfony Captcha Api Basics Example](https://captcha.com/doc/php/examples/symfony-basic-captcha-bundle-example.html)
+* [Symfony Captcha Form Model Validation Example](https://captcha.com/doc/php/examples/symfony-form-validation-captcha-bundle-example.html)
+* [Symfony Captcha FOSUserBundle Example](https://captcha.com/doc/php/examples/symfony-fosuserbundle-captcha-example.html)
 
 
 ## Other BotDetect PHP Captcha integrations
 
-* [Plain PHP Captcha](https://captcha.com/doc/php/php-captcha-quickstart.html)
-* [BotDetect PHP WordPress Captcha plugin](https://captcha.com/doc/php/wordpress-captcha.html)
-* [BotDetect PHP Captcha integration for the CakePHP framework](https://captcha.com/doc/php/cakephp-captcha-quickstart.html)
-* [BotDetect PHP Captcha integration for the CodeIgniter framework](https://captcha.com/doc/php/codeigniter-captcha-quickstart.html)
-* [BotDetect PHP Captcha integration for the Laravel framework](https://captcha.com/doc/php/laravel-captcha-quickstart.html)
+* [Plain PHP Captcha Integration](https://captcha.com/doc/php/php-captcha-quickstart.html)
+* [WordPress Captcha Plugin](https://captcha.com/doc/php/wordpress-captcha.html)
+* [CakePHP Captcha Integration](https://captcha.com/doc/php/cakephp-captcha-quickstart.html)
+* [CodeIgniter Captcha Integration](https://captcha.com/doc/php/codeigniter-captcha-quickstart.html)
+* [Laravel Captcha Integration](https://captcha.com/doc/php/laravel-captcha-quickstart.html)
 
 
 ## Questions?
 
-If you encounter bugs, implementation issues, a usage scenario you would like to discuss, or you have any questions, please contact [BotDetect Captcha Support](http://captcha.com/support).
+If you encounter bugs, implementation issues, a usage scenario you would like to discuss, or you have any questions, please contact [BotDetect CAPTCHA Support](http://captcha.com/support).
