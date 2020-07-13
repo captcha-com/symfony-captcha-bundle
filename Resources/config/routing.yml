@@ -1,9 +1,9 @@
 captcha_handler:
     path: /captcha-handler
-    defaults: { _controller: CaptchaBundle:CaptchaHandler:index }
+    defaults: { _controller: Captcha\Bundle\CaptchaBundle\Controller\CaptchaHandlerController::indexAction }
     methods: [GET]
 
 simple_captcha_handler:
     path: /simple-captcha-handler
-    defaults: { _controller: CaptchaBundle:SimpleCaptchaHandler:index }
+    defaults: { _controller: Captcha\Bundle\CaptchaBundle\Controller\SimpleCaptchaHandlerController::indexAction }
     methods: [GET]
