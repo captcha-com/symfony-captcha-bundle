@@ -15,10 +15,10 @@ class Configuration implements ConfigurationInterface
     {
         $captchaLibPathDefault = Path::getDefaultLibPackageDirPath();
 
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('captcha');
+        $treeBuilder = new TreeBuilder('captcha');
 
-        $rootNode
+        $treeBuilder
+            ->getRootNode()
             ->children()
                 ->variableNode('botdetect_captcha_path')->defaultValue($captchaLibPathDefault)->end()
                 ->variableNode('captchaConfig')->defaultValue(null)->end()
