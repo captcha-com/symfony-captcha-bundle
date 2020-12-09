@@ -27,3 +27,7 @@
 ## Questions?
 
 If you encounter bugs, implementation issues, a usage scenario you would like to discuss, or you have any questions, please contact [BotDetect CAPTCHA Support](http://captcha.com/support).
+
+# How to install with Composer
+
+Simply run composer require carlos-mg89/symfony-captcha-bundle
