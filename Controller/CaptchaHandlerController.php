@@ -6,10 +6,10 @@ use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Support\LibraryLoader;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class CaptchaHandlerController extends Controller
+class CaptchaHandlerController extends AbstractController
 {
     /**
      * @var object
