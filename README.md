@@ -58,15 +58,7 @@ Simply run `composer require carlos-mg89/symfony-captcha-bundle`
       ],
     ];
    ```
- 4. Edit your `config/services.yaml` so it autowires the controllers used in the library:
-    ``` 
-    # We need to autowire the Container (or manually wire it)
-    services:
-        Captcha\Bundle\CaptchaBundle\Controller\:
-            resource: '../vendor/carlos-mg89/symfony-captcha-bundle/Controller'
-            autowire: true
-    ```
- 5. Edit your `FormType` or your `FormBuilderInterface` with this bit that adds the captcha along with the constraing to validate the form:
+ 4. Edit your `FormType` or your `FormBuilderInterface` with this bit that adds the captcha along with the constraing to validate the form:
     ```
     $builder->add('captchaCode', CaptchaType::class, [
         'captchaConfig' => 'ExampleCaptcha',
@@ -77,12 +69,12 @@ Simply run `composer require carlos-mg89/symfony-captcha-bundle`
         ]
     ]);
     ```
- 6. Now edit your Twig template with the new `captchaCode` (`CaptchaType`):
+ 5. Now edit your Twig template with the new `captchaCode` (`CaptchaType`):
     ```
     {{ form_label(form.captchaCode) }}
     {{ form_widget(form.captchaCode}) }}
     ```
- 7. Finally, add the Form validation:
+ 6. Finally, add the Form validation:
     ```
     $contactForm = $this->createForm(ContactType::class);
     $contactForm->handleRequest($request);

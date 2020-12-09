@@ -61,3 +61,8 @@ services:
             - '@service_container'
         tags:
             - { name: validator.constraint_validator, alias: valid_simple_captcha }
+
+    Captcha\Bundle\CaptchaBundle\Controller\:
+        resource: '../../Controller'
+        arguments:
+            - '@service_container'
