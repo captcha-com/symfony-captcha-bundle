@@ -31,7 +31,7 @@ final class Path
      */
     public static function getDefaultLibPackageDirPath()
     {
-        $libPath1 = __DIR__ . '/../../captcha/botdetect-captcha-lib';
+        $libPath1 = __DIR__ . '/../../../captcha-com/captcha/botdetect-captcha-lib';
         $libPath2 = __DIR__ . '/../../captcha/lib';
 
         if (is_dir($libPath1)) {
