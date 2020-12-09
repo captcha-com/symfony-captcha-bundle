@@ -46,7 +46,7 @@ class LibraryLoader
      */
     private function loadBotDetectLibrary()
     {
-        $libPath = Path::getCaptchaLibPath($this->container);
+        $libPath = Path::getDefaultLibPackageDirPath();
         
         if (!self::isLibraryFound($libPath)) {
             throw new FileNotFoundException(sprintf('The BotDetect Captcha library could not be found in %s.', $libPath));
