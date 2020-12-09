@@ -112,7 +112,7 @@ class CaptchaHandlerController extends AbstractController
             throw new BadRequestHttpException('Invalid file name.');
         }
 
-        $resourcePath = realpath(Path::getPublicDirPathInLibrary($this->container) . $filename);
+        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . $filename);
 
         if (!is_file($resourcePath)) {
             throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $filename));
@@ -393,7 +393,7 @@ class CaptchaHandlerController extends AbstractController
         header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
 
         // 1. load BotDetect script
-        $resourcePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-traditional-api-script-include.js');
+        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-traditional-api-script-include.js');
 
         if (!is_file($resourcePath)) {
             throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $resourcePath));

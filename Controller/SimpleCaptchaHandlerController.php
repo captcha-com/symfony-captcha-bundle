@@ -2,10 +2,18 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Controller;
 
+use BDC_HttpHelper;
+use BDC_SimpleCaptchaBase;
+use BDC_SimpleCaptchaHttpCommand;
+use BDC_SimpleCaptchaScriptsHelper;
+use BDC_StringHelper;
 use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Support\SimpleLibraryLoader;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectSimpleCaptchaHelper;
-use Symfony\Component\HttpFoundation\Response;
+use CorsAuth;
+use ImageFormat;
+use SimpleCaptchaRequestValidator;
+use SoundRegenerationMode;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -24,70 +32,70 @@ class SimpleCaptchaHandlerController extends AbstractController
         $this->captcha = $this->getBotDetectCaptchaInstance();
         
         $commandString = $this->getUrlParameter('get');
-        if (!\BDC_StringHelper::HasValue($commandString)) {
-            \BDC_HttpHelper::BadRequest('command');
+        if (!BDC_StringHelper::HasValue($commandString)) {
+            BDC_HttpHelper::BadRequest('command');
         }
 
-        $commandString = \BDC_StringHelper::Normalize($commandString);
-        $command = \BDC_SimpleCaptchaHttpCommand::FromQuerystring($commandString);
+        $commandString = BDC_StringHelper::Normalize($commandString);
+        $command = BDC_SimpleCaptchaHttpCommand::FromQuerystring($commandString);
         $responseBody = '';
         switch ($command) {
-            case \BDC_SimpleCaptchaHttpCommand::GetImage:
+            case BDC_SimpleCaptchaHttpCommand::GetImage:
                 $responseBody = $this->getImage();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetBase64ImageString:
+            case BDC_SimpleCaptchaHttpCommand::GetBase64ImageString:
                 $responseBody = $this->getBase64ImageString();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetSound:
+            case BDC_SimpleCaptchaHttpCommand::GetSound:
                 $responseBody = $this->getSound();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetHtml:
+            case BDC_SimpleCaptchaHttpCommand::GetHtml:
                 $responseBody = $this->getHtml();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetValidationResult:
+            case BDC_SimpleCaptchaHttpCommand::GetValidationResult:
                 $responseBody = $this->getValidationResult();
                 break;
 
             // Sound icon
-            case \BDC_SimpleCaptchaHttpCommand::GetSoundIcon:
+            case BDC_SimpleCaptchaHttpCommand::GetSoundIcon:
                 $responseBody = $this->getSoundIcon();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetSoundSmallIcon:
+            case BDC_SimpleCaptchaHttpCommand::GetSoundSmallIcon:
                 $responseBody = $this->getSmallSoundIcon();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetSoundDisabledIcon:
+            case BDC_SimpleCaptchaHttpCommand::GetSoundDisabledIcon:
                 $responseBody = $this->getDisabledSoundIcon();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetSoundSmallDisabledIcon:
+            case BDC_SimpleCaptchaHttpCommand::GetSoundSmallDisabledIcon:
                 $responseBody = $this->getSmallDisabledSoundIcon();
                 break;
             
                 // Reload icon
-            case \BDC_SimpleCaptchaHttpCommand::GetReloadIcon:
+            case BDC_SimpleCaptchaHttpCommand::GetReloadIcon:
                 $responseBody = $this->getReloadIcon();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetReloadSmallIcon:
+            case BDC_SimpleCaptchaHttpCommand::GetReloadSmallIcon:
                 $responseBody = $this->getSmallReloadIcon();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetReloadDisabledIcon:
+            case BDC_SimpleCaptchaHttpCommand::GetReloadDisabledIcon:
                 $responseBody = $this->getDisabledReloadIcon();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetReloadSmallDisabledIcon:
+            case BDC_SimpleCaptchaHttpCommand::GetReloadSmallDisabledIcon:
                 $responseBody = $this->getSmallDisabledReloadIcon();
                 break;
 
             // css, js
-            case \BDC_SimpleCaptchaHttpCommand::GetScriptInclude:
+            case BDC_SimpleCaptchaHttpCommand::GetScriptInclude:
                 $responseBody = $this->getScriptInclude();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetLayoutStyleSheet:
+            case BDC_SimpleCaptchaHttpCommand::GetLayoutStyleSheet:
                 $responseBody = $this->getLayoutStyleSheet();
                 break;
-            case \BDC_SimpleCaptchaHttpCommand::GetP:
+            case BDC_SimpleCaptchaHttpCommand::GetP:
                 $responseBody = $this->getP();
                 break;
             default:
-                \BDC_HttpHelper::BadRequest('command');
+                BDC_HttpHelper::BadRequest('command');
                 break;
         }
 
@@ -114,8 +122,8 @@ class SimpleCaptchaHandlerController extends AbstractController
 
         $captchaId = $this->getUrlParameter('t');
         if ($captchaId !== null) {
-            $captchaId = \BDC_StringHelper::Normalize($captchaId);
-            if (1 !== preg_match(\BDC_SimpleCaptchaBase::VALID_CAPTCHA_ID, $captchaId)) {
+            $captchaId = BDC_StringHelper::Normalize($captchaId);
+            if (1 !== preg_match(BDC_SimpleCaptchaBase::VALID_CAPTCHA_ID, $captchaId)) {
                 return null;
             }
         }
@@ -134,30 +142,30 @@ class SimpleCaptchaHandlerController extends AbstractController
         header("Access-Control-Allow-Origin: *");
 
         // authenticate client-side request
-        $corsAuth = new \CorsAuth();
+        $corsAuth = new CorsAuth();
         if (!$corsAuth->IsClientAllowed()) {
-            \BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
+            BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
             return null;
         }
 
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $captchaId = $this->getCaptchaId();
         if (is_null($captchaId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         // image generation invalidates sound cache, if any
         $this->clearSoundData($this->captcha, $captchaId);
 
         // response headers
-        \BDC_HttpHelper::DisallowCache();
+        BDC_HttpHelper::DisallowCache();
 
         // response MIME type & headers
-        $imageType = \ImageFormat::GetName($this->captcha->ImageFormat);
+        $imageType = ImageFormat::GetName($this->captcha->ImageFormat);
         $imageType = strtolower($imageType[0]);
         $mimeType = "image/" . $imageType;
         header("Content-Type: {$mimeType}");
@@ -179,22 +187,21 @@ class SimpleCaptchaHandlerController extends AbstractController
         header("Access-Control-Allow-Origin: *");
   
         // authenticate client-side request
-        $corsAuth = new \CorsAuth();
+        $corsAuth = new CorsAuth();
         if (!$corsAuth->IsClientAllowed()) {
-            \BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
+            BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
             return null;
         }
         
 
         // MIME type
-        $imageType = \ImageFormat::GetName($this->captcha->ImageFormat);
+        $imageType = ImageFormat::GetName($this->captcha->ImageFormat);
         $imageType = strtolower($imageType[0]);
         $mimeType = "image/" . $imageType;
 
         $rawImage = $this->getImageData($this->captcha);
 
-        $base64ImageString = sprintf('data:%s;base64,%s', $mimeType, base64_encode($rawImage));
-        return $base64ImageString;
+        return sprintf('data:%s;base64,%s', $mimeType, base64_encode($rawImage));
     }
 
 
@@ -203,7 +210,7 @@ class SimpleCaptchaHandlerController extends AbstractController
         // identifier of the particular Captcha object instance
         $captchaId = $this->getCaptchaId();
         if (is_null($captchaId)) {
-          \BDC_HttpHelper::BadRequest('Captcha Id doesn\'t exist');
+          BDC_HttpHelper::BadRequest('Captcha Id doesn\'t exist');
         }
       
         if ($this->isObviousBotRequest($p_Captcha)) {
@@ -214,7 +221,7 @@ class SimpleCaptchaHandlerController extends AbstractController
         $this->clearSoundData($p_Captcha, $captchaId);
       
         // response headers
-        \BDC_HttpHelper::DisallowCache();
+        BDC_HttpHelper::DisallowCache();
       
         // we don't support content chunking, since image files
         // are regenerated randomly on each request
@@ -238,20 +245,20 @@ class SimpleCaptchaHandlerController extends AbstractController
         header("Access-Control-Allow-Origin: *");
 
         // authenticate client-side request
-        $corsAuth = new \CorsAuth();
+        $corsAuth = new CorsAuth();
         if (!$corsAuth->IsClientAllowed()) {
-            \BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
+            BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
             return null;
         }
 
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $captchaId = $this->getCaptchaId();
         if (is_null($captchaId)) {
-            \BDC_HttpHelper::BadRequest('Captcha Id doesn\'t exist');
+            BDC_HttpHelper::BadRequest('Captcha Id doesn\'t exist');
         }
 
         if ($this->isObviousBotRequest($this->captcha)) {
@@ -261,14 +268,14 @@ class SimpleCaptchaHandlerController extends AbstractController
         $soundBytes = $this->getSoundData($this->captcha, $captchaId);
 
         if (is_null($soundBytes)) {
-            \BDC_HttpHelper::BadRequest('Please reload the form page before requesting another Captcha sound');
+            BDC_HttpHelper::BadRequest('Please reload the form page before requesting another Captcha sound');
             exit;
         }
 
         $totalSize = strlen($soundBytes);
 
         // response headers
-        \BDC_HttpHelper::SmartDisallowCache();
+        BDC_HttpHelper::SmartDisallowCache();
 
         // response MIME type & headers
         $mimeType = $this->captcha->CaptchaBase->SoundMimeType;
@@ -292,7 +299,7 @@ class SimpleCaptchaHandlerController extends AbstractController
             // end of sound playback, cleanup and tell AppleCoreMedia to stop requesting
             // invalid "bytes=rangeEnd-rangeEnd" ranges in an infinite(?) loop
             if ($rangeStart == $rangeEnd || $rangeEnd > $totalSize) {
-                \BDC_HttpHelper::BadRequest('invalid byte range');
+                BDC_HttpHelper::BadRequest('invalid byte range');
             }
 
             $rangeBytes = substr($soundBytes, $rangeStart, $rangeSize);
@@ -319,7 +326,7 @@ class SimpleCaptchaHandlerController extends AbstractController
     public function getSoundData($p_Captcha, $p_CaptchaId)
     {
         $shouldCache = (
-            ($p_Captcha->SoundRegenerationMode == \SoundRegenerationMode::None) || // no sound regeneration allowed, so we must cache the first and only generated sound
+            ($p_Captcha->SoundRegenerationMode == SoundRegenerationMode::None) || // no sound regeneration allowed, so we must cache the first and only generated sound
             $this->detectIosRangeRequest() // keep the same Captcha sound across all chunked iOS requests
         );
 
@@ -368,20 +375,20 @@ class SimpleCaptchaHandlerController extends AbstractController
     private function detectIosRangeRequest()
     {
         if (array_key_exists('HTTP_RANGE', $_SERVER) &&
-            \BDC_StringHelper::HasValue($_SERVER['HTTP_RANGE'])) {
+            BDC_StringHelper::HasValue($_SERVER['HTTP_RANGE'])) {
 
             // Safari on MacOS and all browsers on <= iOS 10.x
             if (array_key_exists('HTTP_X_PLAYBACK_SESSION_ID', $_SERVER) &&
-                \BDC_StringHelper::HasValue($_SERVER['HTTP_X_PLAYBACK_SESSION_ID'])) {
+                BDC_StringHelper::HasValue($_SERVER['HTTP_X_PLAYBACK_SESSION_ID'])) {
                 return true;
             }
 
             $userAgent = array_key_exists('HTTP_USER_AGENT', $_SERVER) ? $_SERVER['HTTP_USER_AGENT'] : null;
 
             // all browsers on iOS 11.x and later
-            if(\BDC_StringHelper::HasValue($userAgent)) {
-                $userAgentLC = \BDC_StringHelper::Lowercase($userAgent);
-                if (\BDC_StringHelper::Contains($userAgentLC, "like mac os") || \BDC_StringHelper::Contains($userAgentLC, "like macos")) {
+            if(BDC_StringHelper::HasValue($userAgent)) {
+                $userAgentLC = BDC_StringHelper::Lowercase($userAgent);
+                if (BDC_StringHelper::Contains($userAgentLC, "like mac os") || BDC_StringHelper::Contains($userAgentLC, "like macos")) {
                     return true;
                 }
             }
@@ -393,7 +400,7 @@ class SimpleCaptchaHandlerController extends AbstractController
     {
         // chunked requests must include the desired byte range
         $rangeStr = $_SERVER['HTTP_RANGE'];
-        if (!\BDC_StringHelper::HasValue($rangeStr)) {
+        if (!BDC_StringHelper::HasValue($rangeStr)) {
             return;
         }
 
@@ -410,7 +417,7 @@ class SimpleCaptchaHandlerController extends AbstractController
         $detected = false;
         if (array_key_exists('HTTP_RANGE', $_SERVER)) {
             $rangeStr = $_SERVER['HTTP_RANGE'];
-            if (\BDC_StringHelper::HasValue($rangeStr) &&
+            if (BDC_StringHelper::HasValue($rangeStr) &&
                 preg_match('/bytes=0-$/', $rangeStr)) {
                 $detected = true;
             }
@@ -422,13 +429,12 @@ class SimpleCaptchaHandlerController extends AbstractController
     {
         header("Access-Control-Allow-Origin: *");
 
-        $corsAuth = new \CorsAuth();
+        $corsAuth = new CorsAuth();
         if (!$corsAuth->IsClientAllowed()) {
-            \BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
+            BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
         }
 
-        $html = "<div>" . $this->captcha->Html() . "</div>";
-        return $html;
+        return "<div>" . $this->captcha->Html() . "</div>";
     }
 
     /**
@@ -441,20 +447,20 @@ class SimpleCaptchaHandlerController extends AbstractController
         header("Access-Control-Allow-Origin: *");
 
         // authenticate client-side request
-        $corsAuth = new \CorsAuth();
+        $corsAuth = new CorsAuth();
         if (!$corsAuth->IsClientAllowed()) {
-            \BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
+            BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
             return null;
         }
 
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $captchaId = $this->getCaptchaId();
         if (is_null($captchaId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         $mimeType = 'application/json';
@@ -468,64 +474,62 @@ class SimpleCaptchaHandlerController extends AbstractController
         if (isset($userInput) && (isset($captchaId))) {
             $result = $this->captcha->AjaxValidate($userInput, $captchaId);
         }
-        $resultJson = $this->getJsonValidationResult($result);
-
-        return $resultJson;
+        return $this->getJsonValidationResult($result);
     }
 
     // Get Reload Icon group
     public function getSoundIcon()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-sound-icon.gif');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-sound-icon.gif');
         return $this->getWebResource($filePath, 'image/gif');
     }
 
     public function getSmallSoundIcon()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-sound-small-icon.gif');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-sound-small-icon.gif');
         return $this->getWebResource($filePath, 'image/gif');
     }
 
     public function getDisabledSoundIcon()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-sound-disabled-icon.gif');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-sound-disabled-icon.gif');
         return $this->getWebResource($filePath, 'image/gif');
     }
 
     public function getSmallDisabledSoundIcon()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-sound-small-disabled-icon.gif');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-sound-small-disabled-icon.gif');
         return $this->getWebResource($filePath, 'image/gif');
     }
 
     // Get Reload Icon group
     public function getReloadIcon()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-reload-icon.gif');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-reload-icon.gif');
         return $this->getWebResource($filePath, 'image/gif');
     }
 
     public function getSmallReloadIcon()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-reload-small-icon.gif');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-reload-small-icon.gif');
         return $this->getWebResource($filePath, 'image/gif');
     }
 
     public function getDisabledReloadIcon()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-reload-disabled-icon.gif');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-reload-disabled-icon.gif');
         return $this->getWebResource($filePath, 'image/gif');
     }
 
     public function getSmallDisabledReloadIcon()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-reload-small-disabled-icon.gif');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-reload-small-disabled-icon.gif');
         return $this->getWebResource($filePath, 'image/gif');
     }
 
     public function getLayoutStyleSheet()
     {
-        $filePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-layout-stylesheet.css');
+        $filePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-layout-stylesheet.css');
         return $this->getWebResource($filePath, 'text/css');
     }
 
@@ -535,13 +539,13 @@ class SimpleCaptchaHandlerController extends AbstractController
 
         // saved data for the specified Captcha object in the application
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $captchaId = $this->getCaptchaId();
         if (is_null($captchaId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         // response MIME type & headers
@@ -549,7 +553,7 @@ class SimpleCaptchaHandlerController extends AbstractController
         header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
 
         // 1. load BotDetect script
-        $resourcePath = realpath(Path::getPublicDirPathInLibrary($this->container) . 'bdc-simple-api-script-include.js');
+        $resourcePath = realpath(Path::getPublicDirPathInLibrary() . 'bdc-simple-api-script-include.js');
 
         if (!is_file($resourcePath)) {
             throw new BadRequestHttpException(sprintf('File "%s" could not be found.', $resourcePath));
@@ -558,12 +562,12 @@ class SimpleCaptchaHandlerController extends AbstractController
         $script = $this->getWebResource($resourcePath, 'text/javascript', false);
 
         // 2. load BotDetect Init script
-        $script .= \BDC_SimpleCaptchaScriptsHelper::GetInitScriptMarkup($this->captcha, $captchaId);
+        $script .= BDC_SimpleCaptchaScriptsHelper::GetInitScriptMarkup($this->captcha, $captchaId);
 
         // add remote scripts if enabled
         if ($this->captcha->RemoteScriptEnabled) {
             $script .= "\r\n";
-            $script .= \BDC_SimpleCaptchaScriptsHelper::GetRemoteScript($this->captcha, $this->getClientSideFramework());
+            $script .= BDC_SimpleCaptchaScriptsHelper::GetRemoteScript($this->captcha, $this->getClientSideFramework());
         }
 
         return $script;
@@ -572,8 +576,8 @@ class SimpleCaptchaHandlerController extends AbstractController
     private function getClientSideFramework()
     {
         $clientSide = $this->getUrlParameter('cs');
-        if (\BDC_StringHelper::HasValue($clientSide)) {
-            $clientSide = \BDC_StringHelper::Normalize($clientSide);
+        if (BDC_StringHelper::HasValue($clientSide)) {
+            $clientSide = BDC_StringHelper::Normalize($clientSide);
             return $clientSide;
         }
         return null;
@@ -583,7 +587,7 @@ class SimpleCaptchaHandlerController extends AbstractController
     {
         header("Content-Type: $p_MimeType");
         if ($hasEtag) {
-            \BDC_HttpHelper::AllowEtagCache($p_Resource);
+            BDC_HttpHelper::AllowEtagCache($p_Resource);
         }
       
         return file_get_contents($p_Resource);
@@ -591,14 +595,14 @@ class SimpleCaptchaHandlerController extends AbstractController
 
     private function isObviousBotRequest($p_Captcha)
     {
-        $captchaRequestValidator = new \SimpleCaptchaRequestValidator($p_Captcha->Configuration);
+        $captchaRequestValidator = new SimpleCaptchaRequestValidator($p_Captcha->Configuration);
       
       
         // some basic request checks
         $captchaRequestValidator->RecordRequest();
       
         if ($captchaRequestValidator->IsObviousBotAttempt()) {
-          \BDC_HttpHelper::TooManyRequests('IsObviousBotAttempt');
+          BDC_HttpHelper::TooManyRequests('IsObviousBotAttempt');
         }
       
         return false;
@@ -611,7 +615,7 @@ class SimpleCaptchaHandlerController extends AbstractController
     {
         $captchaId = $this->getUrlParameter('t');
 
-        if (!\BDC_StringHelper::HasValue($captchaId)) {
+        if (!BDC_StringHelper::HasValue($captchaId)) {
             return null;
         }
 
@@ -620,7 +624,7 @@ class SimpleCaptchaHandlerController extends AbstractController
             return null;
         }
         
-        if (1 !== preg_match(\BDC_SimpleCaptchaBase::VALID_CAPTCHA_ID, $captchaId)) {
+        if (1 !== preg_match(BDC_SimpleCaptchaBase::VALID_CAPTCHA_ID, $captchaId)) {
             return null;
         }
 
@@ -655,12 +659,12 @@ class SimpleCaptchaHandlerController extends AbstractController
     /**
      * Encodes the Captcha validation result in a simple JSON wrapper.
      *
+     * @param $result
      * @return string
      */
     private function getJsonValidationResult($result)
     {
-        $resultStr = ($result ? 'true': 'false');
-        return $resultStr;
+        return ($result ? 'true': 'false');
     }
 
     /**
@@ -677,20 +681,20 @@ class SimpleCaptchaHandlerController extends AbstractController
         header("Access-Control-Allow-Origin: *");
 
         // authenticate client-side request
-        $corsAuth = new \CorsAuth();
+        $corsAuth = new CorsAuth();
         if (!$corsAuth->IsClientAllowed()) {
-            \BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
+            BDC_HttpHelper::BadRequest($corsAuth->GetFrontEnd() . " is not an allowed front-end");
             return null;
         }
 
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $captchaId = $this->getCaptchaId();
         if (is_null($captchaId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         // create new one
@@ -703,7 +707,7 @@ class SimpleCaptchaHandlerController extends AbstractController
         // response MIME type & headers
         header('Content-Type: application/json');
         header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
-        \BDC_HttpHelper::SmartDisallowCache();
+        BDC_HttpHelper::SmartDisallowCache();
 
         return $response;
     }
