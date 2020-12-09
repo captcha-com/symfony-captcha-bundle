@@ -1,7 +1,7 @@
 # BotDetect PHP Captcha generator integration for the Symfony framework
 
-[![Total Downloads](https://poser.pugx.org/captcha-com/symfony-captcha-bundle/downloads)](https://packagist.org/packages/captcha-com/symfony-captcha-bundle)
-[![Latest Stable Version](https://poser.pugx.org/captcha-com/symfony-captcha-bundle/v/stable)](https://packagist.org/packages/captcha-com/symfony-captcha-bundle)
+[![Total Downloads](https://poser.pugx.org/carlos-mg89/symfony-captcha-bundle/downloads)](https://packagist.org/packages/carlos-mg89/symfony-captcha-bundle)
+[![Latest Stable Version](https://poser.pugx.org/carlos-mg89/symfony-captcha-bundle/v/stable)](https://packagist.org/packages/carlos-mg89/symfony-captcha-bundle)
 
 ![BotDetect PHP CAPTCHA Library](https://captcha.com/images/help/screenshots/captcha-examples.png)
 
