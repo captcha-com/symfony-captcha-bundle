@@ -59,13 +59,7 @@ Simply run `composer require carlos-mg89/symfony-captcha-bundle`
     ];
    ```
  4. Edit your `config/services.yaml` so it autowires the controllers used in the library:
-    ```
-    # This part here will be removed in the future, but right it's necessary
-    parameters:
-        captcha:
-            config:
-                botdetect_captcha_path: '%kernel.project_dir%/vendor/'
-    
+    ``` 
     # We need to autowire the Container (or manually wire it)
     services:
         Captcha\Bundle\CaptchaBundle\Controller\:
