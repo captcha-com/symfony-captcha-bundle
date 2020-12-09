@@ -16,7 +16,7 @@ services:
         public: true
         arguments:
             - '@service_container'
-    
+
     simple_captcha:
         class: '%botdetect_simple_captcha.class%'
         public: true
@@ -61,8 +61,3 @@ services:
             - '@service_container'
         tags:
             - { name: validator.constraint_validator, alias: valid_simple_captcha }
-
-    Captcha\Bundle\CaptchaBundle\Controller\:
-        resource: '../../Controller'
-        arguments:
-            - '@service_container'
