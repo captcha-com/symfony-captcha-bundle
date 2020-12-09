@@ -2,9 +2,16 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Controller;
 
+use BDC_CaptchaBase;
+use BDC_CaptchaHttpCommand;
+use BDC_CaptchaScriptsHelper;
+use BDC_CryptoHelper;
+use BDC_HttpHelper;
+use BDC_StringHelper;
 use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Support\LibraryLoader;
 use Captcha\Bundle\CaptchaBundle\Helpers\BotDetectCaptchaHelper;
+use SoundRegenerationMode;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -33,31 +40,31 @@ class CaptchaHandlerController extends AbstractController
             }
 
             $commandString = $this->getUrlParameter('get');
-            if (!\BDC_StringHelper::HasValue($commandString)) {
-                \BDC_HttpHelper::BadRequest('command');
+            if (!BDC_StringHelper::HasValue($commandString)) {
+                BDC_HttpHelper::BadRequest('command');
             }
 
-            $commandString = \BDC_StringHelper::Normalize($commandString);
-            $command = \BDC_CaptchaHttpCommand::FromQuerystring($commandString);
+            $commandString = BDC_StringHelper::Normalize($commandString);
+            $command = BDC_CaptchaHttpCommand::FromQuerystring($commandString);
             $responseBody = '';
             switch ($command) {
-                case \BDC_CaptchaHttpCommand::GetImage:
+                case BDC_CaptchaHttpCommand::GetImage:
                     $responseBody = $this->getImage();
                     break;
-                case \BDC_CaptchaHttpCommand::GetSound:
+                case BDC_CaptchaHttpCommand::GetSound:
                     $responseBody = $this->getSound();
                     break;
-                case \BDC_CaptchaHttpCommand::GetValidationResult:
+                case BDC_CaptchaHttpCommand::GetValidationResult:
                     $responseBody = $this->getValidationResult();
                     break;
-                case \BDC_CaptchaHttpCommand::GetScriptInclude:
+                case BDC_CaptchaHttpCommand::GetScriptInclude:
                     $responseBody = $this->getScriptInclude();
                     break;
-                case \BDC_CaptchaHttpCommand::GetP:
+                case BDC_CaptchaHttpCommand::GetP:
                     $responseBody = $this->getP();
                     break;
                 default:
-                    \BDC_HttpHelper::BadRequest('command');
+                    BDC_HttpHelper::BadRequest('command');
                     break;
             }
 
@@ -129,20 +136,20 @@ class CaptchaHandlerController extends AbstractController
     public function getImage()
     {
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $instanceId = $this->getInstanceId();
         if (is_null($instanceId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         // image generation invalidates sound cache, if any
         $this->clearSoundData($instanceId);
 
         // response headers
-        \BDC_HttpHelper::DisallowCache();
+        BDC_HttpHelper::DisallowCache();
 
         // response MIME type & headers
         $mimeType = $this->captcha->CaptchaBase->ImageMimeType;
@@ -167,26 +174,26 @@ class CaptchaHandlerController extends AbstractController
     public function getSound()
     {
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $instanceId = $this->getInstanceId();
         if (is_null($instanceId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         $soundBytes = $this->getSoundData($this->captcha, $instanceId);
 
         if (is_null($soundBytes)) {
-            \BDC_HttpHelper::BadRequest('Please reload the form page before requesting another Captcha sound');
+            BDC_HttpHelper::BadRequest('Please reload the form page before requesting another Captcha sound');
             exit;
         }
 
         $totalSize = strlen($soundBytes);
 
         // response headers
-        \BDC_HttpHelper::SmartDisallowCache();
+        BDC_HttpHelper::SmartDisallowCache();
 
         // response MIME type & headers
         $mimeType = $this->captcha->CaptchaBase->SoundMimeType;
@@ -194,7 +201,7 @@ class CaptchaHandlerController extends AbstractController
         header('Content-Transfer-Encoding: binary');
 
         if (!array_key_exists('d', $_GET)) { // javascript player not used, we send the file directly as a download
-            $downloadId = \BDC_CryptoHelper::GenerateGuid();
+            $downloadId = BDC_CryptoHelper::GenerateGuid();
             header("Content-Disposition: attachment; filename=captcha_{$downloadId}.wav");
         }
 
@@ -210,7 +217,7 @@ class CaptchaHandlerController extends AbstractController
             // end of sound playback, cleanup and tell AppleCoreMedia to stop requesting
             // invalid "bytes=rangeEnd-rangeEnd" ranges in an infinite(?) loop
             if ($rangeStart == $rangeEnd || $rangeEnd > $totalSize) {
-                \BDC_HttpHelper::BadRequest('invalid byte range');
+                BDC_HttpHelper::BadRequest('invalid byte range');
             }
 
             $rangeBytes = substr($soundBytes, $rangeStart, $rangeSize);
@@ -238,7 +245,7 @@ class CaptchaHandlerController extends AbstractController
     public function getSoundData($p_Captcha, $p_InstanceId)
     {
         $shouldCache = (
-            ($p_Captcha->SoundRegenerationMode == \SoundRegenerationMode::None) || // no sound regeneration allowed, so we must cache the first and only generated sound
+            ($p_Captcha->SoundRegenerationMode == SoundRegenerationMode::None) || // no sound regeneration allowed, so we must cache the first and only generated sound
             $this->detectIosRangeRequest() // keep the same Captcha sound across all chunked iOS requests
         );
 
@@ -286,20 +293,20 @@ class CaptchaHandlerController extends AbstractController
     private function detectIosRangeRequest()
     {
         if (array_key_exists('HTTP_RANGE', $_SERVER) &&
-            \BDC_StringHelper::HasValue($_SERVER['HTTP_RANGE'])) {
+            BDC_StringHelper::HasValue($_SERVER['HTTP_RANGE'])) {
 
             // Safari on MacOS and all browsers on <= iOS 10.x
             if (array_key_exists('HTTP_X_PLAYBACK_SESSION_ID', $_SERVER) &&
-                \BDC_StringHelper::HasValue($_SERVER['HTTP_X_PLAYBACK_SESSION_ID'])) {
+                BDC_StringHelper::HasValue($_SERVER['HTTP_X_PLAYBACK_SESSION_ID'])) {
                 return true;
             }
 
             $userAgent = array_key_exists('HTTP_USER_AGENT', $_SERVER) ? $_SERVER['HTTP_USER_AGENT'] : null;
 
             // all browsers on iOS 11.x and later
-            if(\BDC_StringHelper::HasValue($userAgent)) {
-                $userAgentLC = \BDC_StringHelper::Lowercase($userAgent);
-                if (\BDC_StringHelper::Contains($userAgentLC, "like mac os") || \BDC_StringHelper::Contains($userAgentLC, "like macos")) {
+            if(BDC_StringHelper::HasValue($userAgent)) {
+                $userAgentLC = BDC_StringHelper::Lowercase($userAgent);
+                if (BDC_StringHelper::Contains($userAgentLC, "like mac os") || BDC_StringHelper::Contains($userAgentLC, "like macos")) {
                     return true;
                 }
             }
@@ -311,7 +318,7 @@ class CaptchaHandlerController extends AbstractController
     {
         // chunked requests must include the desired byte range
         $rangeStr = $_SERVER['HTTP_RANGE'];
-        if (!\BDC_StringHelper::HasValue($rangeStr)) {
+        if (!BDC_StringHelper::HasValue($rangeStr)) {
             return;
         }
 
@@ -328,7 +335,7 @@ class CaptchaHandlerController extends AbstractController
         $detected = false;
         if (array_key_exists('HTTP_RANGE', $_SERVER)) {
             $rangeStr = $_SERVER['HTTP_RANGE'];
-            if (\BDC_StringHelper::HasValue($rangeStr) &&
+            if (BDC_StringHelper::HasValue($rangeStr) &&
                 preg_match('/bytes=0-$/', $rangeStr)) {
                 $detected = true;
             }
@@ -339,18 +346,18 @@ class CaptchaHandlerController extends AbstractController
     /**
      * The client requests the Captcha validation result (used for Ajax Captcha validation).
      *
-     * @return json
+     * @return string
      */
     public function getValidationResult()
     {
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $instanceId = $this->getInstanceId();
         if (is_null($instanceId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         $mimeType = 'application/json';
@@ -365,22 +372,20 @@ class CaptchaHandlerController extends AbstractController
             $result = $this->captcha->AjaxValidate($userInput, $instanceId);
             $this->captcha->CaptchaBase->Save();
         }
-        $resultJson = $this->getJsonValidationResult($result);
-
-        return $resultJson;
+        return $this->getJsonValidationResult($result);
     }
 
     public function getScriptInclude()
     {
         // saved data for the specified Captcha object in the application
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $instanceId = $this->getInstanceId();
         if (is_null($instanceId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         // response MIME type & headers
@@ -397,12 +402,12 @@ class CaptchaHandlerController extends AbstractController
         $script = file_get_contents($resourcePath);
 
         // 2. load BotDetect Init script
-        $script .= \BDC_CaptchaScriptsHelper::GetInitScriptMarkup($this->captcha, $instanceId);
+        $script .= BDC_CaptchaScriptsHelper::GetInitScriptMarkup($this->captcha, $instanceId);
 
         // add remote scripts if enabled
         if ($this->captcha->RemoteScriptEnabled) {
             $script .= "\r\n";
-            $script .= \BDC_CaptchaScriptsHelper::GetRemoteScript($this->captcha);
+            $script .= BDC_CaptchaScriptsHelper::GetRemoteScript($this->captcha);
         }
 
         return $script;
@@ -414,8 +419,8 @@ class CaptchaHandlerController extends AbstractController
     private function getInstanceId()
     {
         $instanceId = $this->getUrlParameter('t');
-        if (!\BDC_StringHelper::HasValue($instanceId) ||
-            !\BDC_CaptchaBase::IsValidInstanceId($instanceId)
+        if (!BDC_StringHelper::HasValue($instanceId) ||
+            !BDC_CaptchaBase::IsValidInstanceId($instanceId)
         ) {
             return;
         }
@@ -450,12 +455,12 @@ class CaptchaHandlerController extends AbstractController
     /**
      * Encodes the Captcha validation result in a simple JSON wrapper.
      *
+     * @param $result
      * @return string
      */
     private function getJsonValidationResult($result)
     {
-        $resultStr = ($result ? 'true': 'false');
-        return $resultStr;
+        return ($result ? 'true': 'false');
     }
 
     /**
@@ -478,13 +483,13 @@ class CaptchaHandlerController extends AbstractController
     public function getP()
     {
         if (is_null($this->captcha)) {
-            \BDC_HttpHelper::BadRequest('captcha');
+            BDC_HttpHelper::BadRequest('captcha');
         }
 
         // identifier of the particular Captcha object instance
         $instanceId = $this->getInstanceId();
         if (is_null($instanceId)) {
-            \BDC_HttpHelper::BadRequest('instance');
+            BDC_HttpHelper::BadRequest('instance');
         }
 
         // create new one
@@ -497,7 +502,7 @@ class CaptchaHandlerController extends AbstractController
         // response MIME type & headers
         header('Content-Type: application/json');
         header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
-        \BDC_HttpHelper::SmartDisallowCache();
+        BDC_HttpHelper::SmartDisallowCache();
 
         return $response;
     }
