@@ -2,9 +2,8 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Support;
 
-use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Support\Exception\FileNotFoundException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class SimpleLibraryLoader
 {
@@ -28,13 +27,9 @@ class SimpleLibraryLoader
      */
     public function load()
     {
-        // load bd php library
         self::loadBotDetectLibrary();
     }
 
-    /**
-     * Load BotDetect CAPTCHA Library.
-     */
     private function loadBotDetectLibrary()
     {
         $libPath = Path::getCaptchaLibPath($this->container);

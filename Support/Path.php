@@ -3,7 +3,7 @@
 namespace Captcha\Bundle\CaptchaBundle\Support;
 
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 final class Path
 {
@@ -31,7 +31,7 @@ final class Path
      */
     public static function getDefaultLibPackageDirPath()
     {
-        $libPath1 = __DIR__ . '/../../captcha/botdetect-captcha-lib';
+        $libPath1 = __DIR__ . '/../../../captcha-com/captcha/botdetect-captcha-lib';
         $libPath2 = __DIR__ . '/../../captcha/lib';
 
         if (is_dir($libPath1)) {
@@ -50,9 +50,9 @@ final class Path
      *
      * @return string
      */
-    public static function getPublicDirPathInLibrary(ContainerInterface $container)
+    public static function getPublicDirPathInLibrary()
     {
-        return self::getCaptchaLibPath($container) . '/botdetect/public/';
+        return self::getDefaultLibPackageDirPath() . '/botdetect/public/';
     }
 
     /**

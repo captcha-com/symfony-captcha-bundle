@@ -2,9 +2,8 @@
 
 namespace Captcha\Bundle\CaptchaBundle\Support;
 
-use Captcha\Bundle\CaptchaBundle\Support\Path;
 use Captcha\Bundle\CaptchaBundle\Support\Exception\FileNotFoundException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class LibraryLoader
 {
@@ -41,12 +40,9 @@ class LibraryLoader
         self::loadCaptchaConfigDefaults();
     }
 
-    /**
-     * Load BotDetect CAPTCHA Library.
-     */
     private function loadBotDetectLibrary()
     {
-        $libPath = Path::getCaptchaLibPath($this->container);
+        $libPath = Path::getDefaultLibPackageDirPath();
         
         if (!self::isLibraryFound($libPath)) {
             throw new FileNotFoundException(sprintf('The BotDetect Captcha library could not be found in %s.', $libPath));
@@ -55,11 +51,6 @@ class LibraryLoader
         self::includeFile(Path::getBotDetectFilePath(), true, $libPath);
     }
 
-    /**
-     * Load the captcha configuration defaults.
-     *
-     * @param SessionInterface  $session
-     */
     private function loadCaptchaConfigDefaults()
     {
         self::includeFile(Path::getCaptchaConfigDefaultsFilePath(), true, $this->session);
