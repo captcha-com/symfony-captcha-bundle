@@ -6,6 +6,9 @@ parameters:
     simple_captcha_type.class: Captcha\Bundle\CaptchaBundle\Form\Type\SimpleCaptchaType
     valid_captcha_validator.class: Captcha\Bundle\CaptchaBundle\Validator\Constraints\ValidCaptchaValidator
     valid_simple_captcha_validator.class: Captcha\Bundle\CaptchaBundle\Validator\Constraints\ValidSimpleCaptchaValidator
+    captcha:
+        config:
+            botdetect_captcha_path: '%kernel.project_dir%/vendor/'
 
 services:
     captcha:
@@ -13,7 +16,7 @@ services:
         public: true
         arguments:
             - '@service_container'
-    
+
     simple_captcha:
         class: '%botdetect_simple_captcha.class%'
         public: true
